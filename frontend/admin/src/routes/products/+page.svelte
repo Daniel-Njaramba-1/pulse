@@ -1,0 +1,64 @@
+<script lang="ts">
+    import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+    import * as Card from "$lib/components/ui/card/index";
+    import { Button } from "$lib/components/ui/button/index";
+    import { Input } from "$lib/components/ui/input/index";
+    import { Search } from "lucide-svelte";
+    import { products, isLoading, error, productHelpers } from "$lib/stores/product";
+    import type { Product } from "$lib/stores/product";
+    
+  
+    // Local state
+    let searchQuery = $state<string>("");
+    
+    // Fetch initial data
+    onMount(async () => {
+        //fetch products
+        const productsResponse = await productHelpers.fetchProducts();
+        if (!productsResponse.success) {
+            console.error("Failed to fetch products:", productsResponse.error);
+        }
+    });
+</script>
+  
+<div class="container mx-auto py-3 px-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
+        <h2 class="text-xl font-semibold">Products</h2>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="relative w-[400px]">
+                <Search class="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                <Input
+                    id="search"
+                    type="search"
+                    placeholder="Search products..."
+                    class="pl-10"
+                    bind:value={searchQuery}
+                />
+            </div>
+        </div>
+
+        <div class="">
+            <Button variant="outline" onclick={() => goto(`/products/create`)}>
+                Create
+            </Button>
+        </div>
+    </div>
+
+    {#if $isLoading && $products.length === 0}
+        <div class="flex justify-center items-center h-48">
+            <div class="text-gray-500">Loading products...</div>
+        </div>
+    {:else if $error}
+        <div class="border border-red-300 bg-red-50 p-4 rounded-lg text-red-800">
+            Error: {$error}
+        </div>
+    {:else}        
+        <!-- Grid of product cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+            {#each $products as product (product.id)}
+                <!-- imagine some silly card here -->
+            {/each}
+        </div>
+    {/if}
+</div>

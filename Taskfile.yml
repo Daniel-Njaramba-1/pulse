@@ -1,0 +1,107 @@
+# https://taskfile.dev
+# spaces: 2
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+  DB_CONN: "postgres://postgres:njaramba@localhost:5432/pulse?sslmode=disable"
+  MIGRATION_DIR: internal/db/migrations
+  SEED_DIR: internal/db/seeds
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+
+  start:
+    desc: Start all services (backend, admin dashboard)
+    cmds:
+      - task: start-go
+      - task: start-admin
+
+
+  start-go:
+    desc: Start Golang server, loading ENV, connecting to DB
+    dir: 
+    cmds:
+      - go run cmd/main.go
+
+  start-admin:
+    desc: Start the admin dashboard
+    dir: frontend/admin
+    cmds:
+      - bun run dev
+
+  start-customer:
+    desc: Start the customer shop
+    dir: frontend/customer
+    cmds:
+      - npm run dev
+
+  create-migration:
+    desc: Create a migration file
+    cmds:
+      - echo "creating a migration file"
+      - goose create {{.name}} sql -dir {{.MIGRATION_DIR}}
+
+  migrate-up:
+    desc: Apply database migrations
+    cmds:
+      - echo "Applying database migrations..."
+      - goose postgres {{.DB_CONN}} -dir {{.MIGRATION_DIR}} up
+
+  migrate-up-by-one:
+    desc: Apply one database migration
+    cmds:
+      - echo "Applying one database migration..."
+      - goose postgres {{.DB_CONN}} -dir {{.MIGRATION_DIR}} up-by-one
+
+  migrate-down:
+    desc: Revert latest database migration
+    cmds:
+      - echo "Reverting latest database migration..."
+      - goose postgres {{.DB_CONN}} -dir {{.MIGRATION_DIR}} down
+
+  migrate-reset:
+    desc: Reset all database migrations
+    cmds:
+      - echo "Resetting all database migrations..."
+      - goose postgres {{.DB_CONN}} -dir {{.MIGRATION_DIR}} reset
+
+  migrate-status:
+    desc: Check migration status
+    cmds:
+      - echo "Checking migration status..."
+      - goose postgres {{.DB_CONN}} -dir {{.MIGRATION_DIR}} status
+
+  create-seed:
+    desc: Create a seed file
+    cmds:
+      - echo "Creating a seed file with name"
+      - goose create {{.name}} sql -dir {{.SEED_DIR}}
+
+  seed-up:
+    desc: Apply database seeds
+    cmds:
+      - echo "Applying database seeds..."
+      - goose postgres {{.DB_CONN}} -dir {{.SEED_DIR}} up
+
+  seed-down:
+    desc: Revert database seeds
+    cmds:
+      - echo "Reverting database seeds..."
+      - goose postgres {{.DB_CONN}} -dir {{.SEED_DIR}} down
+
+  seed-reset:
+    desc: Reset database seeds
+    cmds:
+      - echo "Resetting database seeds..."
+      - goose postgres {{.DB_CONN}} -dir {{.SEED_DIR}} reset
+
+  seed-status:
+    desc: Check seed status
+    cmds:
+      - echo "Checking seed status..."
+      - goose postgres {{.DB_CONN}} -dir {{.SEED_DIR}} status
