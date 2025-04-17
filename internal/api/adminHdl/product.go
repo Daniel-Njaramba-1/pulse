@@ -71,7 +71,9 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 		product.ImagePath = imagePath
 	}
 
-	createdProduct, err := h.productService.CreateProduct(c.Request().Context(), &product)
+	initialStockValue := 0
+
+	createdProduct, err := h.productService.CreateProduct(c.Request().Context(), &product, initialStockValue)
 	if err != nil {
 		logging.LogInfo("Service function called, error: could not create product")
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create product", "details": err.Error()})

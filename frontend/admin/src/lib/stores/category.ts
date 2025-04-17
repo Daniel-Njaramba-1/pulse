@@ -96,7 +96,6 @@ export const categoryHelpers = {
             }
 
             const data: Category = await response.json();
-            categories.update((current) => [...current, data]); // Add the new category to the store
             return { success: true, data };
         } catch (err) {
             console.error("Error creating category:", err);
@@ -121,9 +120,6 @@ export const categoryHelpers = {
             }
 
             const data: Category = await response.json();
-            categories.update((current) =>
-                current.map((category) => (category.id === id ? { ...category, ...data } : category))
-            ); // Update the category in the store
             return { success: true, data };
         } catch (err) {
             console.error("Error updating category:", err);
@@ -145,8 +141,7 @@ export const categoryHelpers = {
                 const errorData = await response.json();
                 return { success: false, error: errorData.message || "Failed to delete category." };
             }
-
-            categories.update((current) => current.filter((category) => category.id !== id)); // Remove the category from the store
+            
             return { success: true };
         } catch (err) {
             console.error("Error deleting category:", err);

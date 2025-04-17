@@ -94,7 +94,6 @@ export const brandHelpers = {
             }
 
             const data: Brand = await response.json();
-            // brands.update((current) => [...current, data]); // Add the new brand to the store
             return { success: true, data };
         } catch (err) {
             console.error("Error creating brand:", err);
@@ -119,9 +118,6 @@ export const brandHelpers = {
             }
 
             const data: Brand = await response.json();
-            brands.update((current) =>
-                current.map((brand) => (brand.id === id ? { ...brand, ...data } : brand))
-            ); // Update the brand in the store
             return { success: true, data };
         } catch (err) {
             console.error("Error updating brand:", err);
@@ -144,7 +140,6 @@ export const brandHelpers = {
                 return { success: false, error: errorData.message || "Failed to delete brand." };
             }
 
-            brands.update((current) => current.filter((brand) => brand.id !== id)); // Remove the brand from the store
             return { success: true };
         } catch (err) {
             console.error("Error deleting brand:", err);

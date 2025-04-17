@@ -107,7 +107,6 @@ export const productHelpers = {
             }
             
             const data: Product = await response.json();
-            products.update(currentProducts => [...currentProducts, data]);
             return { success: true, data };
         } catch (err) {
             console.error("Error creating product:", err);
@@ -147,13 +146,7 @@ export const productHelpers = {
             }
             
             const data: Product = await response.json();
-            
-            products.update(currentProducts => 
-                currentProducts.map(product => 
-                    product.id === id ? data : product
-                )
-            );
-            
+
             return { success: true, data };
         } catch (err) {
             console.error("Error updating product:", err);
@@ -181,11 +174,6 @@ export const productHelpers = {
                 error.set(errorData.error || "Failed to delete product");
                 return { success: false, error: errorData.error };
             }
-            
-            // Update the products store by removing the deleted product
-            products.update(currentProducts => 
-                currentProducts.filter(product => product.id !== id)
-            );
             
             return { success: true };
         } catch (err) {

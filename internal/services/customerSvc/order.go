@@ -58,10 +58,12 @@ func (s *OrderService) GenerateOrder(ctx context.Context, userId int) (*repo.Ord
 
 	for _, item := range cartItems {
 		var currentPrice float64
+		// locking price rows to prevent race condition using SELECT FOR UPDATE
 		getPriceQuery := `
 			SELECT adjusted_price
 			FROM product_metrics
-			WHERE product = $1
+			WHERE product_id = $1
+			FOR UPDATE
 		`
 
 		err  = tx.QueryRowxContext(ctx, getPriceQuery, item.ProductId).Scan(&currentPrice)
@@ -101,8 +103,6 @@ func (s *OrderService) GenerateOrder(ctx context.Context, userId int) (*repo.Ord
 		order.TotalPrice, 
 		order.Status, 
 		order.PriceValidUntil,
-		order.CreatedAt, 
-		order.UpdatedAt,
 	).Scan(&order.Id)
 	
 	if err != nil {
@@ -147,7 +147,5 @@ func (s *OrderService) GenerateOrder(ctx context.Context, userId int) (*repo.Ord
 	}
 	
 	return order, nil
-
-	
 }
 

@@ -24,6 +24,7 @@
                 newCategoryResult = "Category created successfully";
                 newCategoryName = "";
                 newCategoryDescription = "";
+                goto ("/categories")
             } else {
                 newCategoryResult = result.error || "Unknown error occurred";
             }

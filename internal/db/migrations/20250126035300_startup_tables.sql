@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS product_metrics (
     wishlist_count INTEGER DEFAULT 0 CHECK (wishlist_count >= 0),
     base_price DECIMAL(10, 2) CHECK (base_price >= 0), -- Base price before adjustment - static
     adjusted_price DECIMAL(10, 2) CHECK (adjusted_price >= 0),  -- Adjusted price after machine learning - dynamic
+    last_sale TIMESTAMP,
     last_price_update TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -60,12 +61,17 @@ CREATE TABLE IF NOT EXISTS product_metrics (
 CREATE TABLE IF NOT EXISTS pricing_features (
     id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL UNIQUE,
-    demand_score DECIMAL(10, 4), -- Normalized demand metric
-    competitive_index DECIMAL(10, 4), -- Competitiveness metric
-    seasonality_factor DECIMAL(10, 4), -- Seasonal impact
-    inventory_ratio DECIMAL(10, 4), -- Current inventory / target inventory
-    days_in_stock INTEGER, -- How long product has been in inventory
-    view_to_purchase_ratio DECIMAL(10, 4), -- Conversion metric
+    days_since_last_sale INTEGER,
+    sales_velocity DECIMAL(10, 2) DEFAULT 0,
+    total_sales_count INTEGER DEFAULT 0,
+    total_sales_value INTEGER DEFAULT 0,
+    category_rank INTEGER,
+    category_percentile DECIMAL(10, 2), 
+    review_score DECIMAL(10, 2) DEFAULT 0,
+    wishlist_to_sales_ratio DECIMAL (10, 2) DEFAULT 0,
+    days_in_stock INTEGER DEFAULT 0,
+    seasonal_factor DECIMAL(10, 2) DEFAULT 1.0,
+    last_model_run TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
@@ -74,13 +80,26 @@ CREATE TABLE IF NOT EXISTS pricing_features (
 -- Create table for regression model coefficients
 CREATE TABLE IF NOT EXISTS price_model_coefficients (
     id SERIAL PRIMARY KEY,
-    product_category_id INTEGER, -- NULL means global model
-    feature_name VARCHAR(100) NOT NULL,
-    coefficient DECIMAL(20, 10) NOT NULL, -- Precision for small coefficient values
-    last_trained_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- Model metadata
+    model_version VARCHAR(50) NOT NULL,
+    training_date TIMESTAMP NOT NULL,
+    sample_size INTEGER NOT NULL,
+    r_squared DECIMAL(10, 8),
+    -- Coefficients for each feature
+    intercept DECIMAL(12, 6) NOT NULL,
+    sales_count_coef DECIMAL(12, 6),
+    sales_value_coef DECIMAL(12, 6),
+    sales_velocity_coef DECIMAL(12, 6),
+    days_since_sale_coef DECIMAL(12, 6),
+    category_rank_coef DECIMAL(12, 6),
+    category_percentile_coef DECIMAL(12, 6),
+    review_score_coef DECIMAL(12, 6),
+    wishlist_ratio_coef DECIMAL(12, 6),
+    days_in_stock_coef DECIMAL(12, 6),
+    seasonal_factor_coef DECIMAL(12, 6),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_category_id) REFERENCES categories(id) ON DELETE CASCADE
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
 );
 
 CREATE TABLE IF NOT EXISTS price_adjustments (
@@ -100,6 +119,20 @@ CREATE TABLE IF NOT EXISTS stocks (
     product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 0 CHECK (quantity >= 0),
     stock_threshold INTEGER NOT NULL DEFAULT 0 CHECK (stock_threshold >= 0), -- Threshold for low stock alert
+    first_stocked_date TIMESTAMP,
+    last_out_of_stock_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS stock_history (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER NOT NULL,
+    event_type VARCHAR(20) NOT NULL, -- "in stock", "out of stock", "restock"
+    quantity_change INTEGER NOT NULL,
+    quantity_after INTEGER NOT NULL,
+    event_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
@@ -184,7 +217,7 @@ CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
     customer_id INTEGER NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL CHECK (total_price >= 0),
-    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    status VARCHAR(50) NOT NULL DEFAULT 'pending', -- pending, completed, failed, cancelled
     price_valid_until TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -229,71 +262,65 @@ CREATE TABLE IF NOT EXISTS sales (
 );
 
 CREATE INDEX IF NOT EXISTS idx_products_brand_id ON products(brand_id);
+CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_name ON products(name);
 CREATE INDEX IF NOT EXISTS idx_product_metrics_product_id ON product_metrics(product_id);
 CREATE INDEX IF NOT EXISTS idx_stocks_product_id ON stocks(product_id);
+CREATE INDEX IF NOT EXISTS idx_stock_history_product_id ON stock_history(product_id);
+CREATE INDEX IF NOT EXISTS idx_pricing_features_product_id ON pricing_features(product_id);
+CREATE INDEX IF NOT EXISTS idx_price_adjustments_product_id ON price_adjustments(product_id);
 CREATE INDEX IF NOT EXISTS idx_sales_product_id ON sales(product_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON reviews(product_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_customer_id ON reviews(customer_id);
 CREATE INDEX IF NOT EXISTS idx_carts_customer_id ON carts(customer_id);
 CREATE INDEX IF NOT EXISTS idx_cart_items_cart_id ON cart_items(cart_id);
+CREATE INDEX IF NOT EXISTS idx_cart_items_product_id ON cart_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_wishlist_items_product_id ON wishlist_items(product_id);
 CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_payments_order_id ON payments(order_id);
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-ALTER TABLE payments DROP CONSTRAINT IF EXISTS payments_order_id_fkey;
-ALTER TABLE order_items DROP CONSTRAINT IF EXISTS order_items_order_id_fkey;
-ALTER TABLE order_items DROP CONSTRAINT IF EXISTS order_items_product_id_fkey;
-ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_customer_id_fkey;
-ALTER TABLE cart_items DROP CONSTRAINT IF EXISTS cart_items_cart_id_fkey;
-ALTER TABLE cart_items DROP CONSTRAINT IF EXISTS cart_items_product_id_fkey;
-ALTER TABLE carts DROP CONSTRAINT IF EXISTS carts_customer_id_fkey;
-ALTER TABLE wishlist_items DROP CONSTRAINT IF EXISTS wishlist_items_wishlist_id_fkey;
-ALTER TABLE wishlist_items DROP CONSTRAINT IF EXISTS wishlist_items_product_id_fkey;
-ALTER TABLE wishlists DROP CONSTRAINT IF EXISTS wishlists_customer_id_fkey;
-ALTER TABLE reviews DROP CONSTRAINT IF EXISTS reviews_customer_id_fkey;
-ALTER TABLE reviews DROP CONSTRAINT IF EXISTS reviews_product_id_fkey;
-ALTER TABLE customer_profiles DROP CONSTRAINT IF EXISTS customer_profiles_customer_id_fkey;
-ALTER TABLE sales DROP CONSTRAINT IF EXISTS sales_order_id_fkey;
-ALTER TABLE sales DROP CONSTRAINT IF EXISTS sales_product_id_fkey;
-ALTER TABLE stocks DROP CONSTRAINT IF EXISTS stocks_product_id_fkey;
-ALTER TABLE price_adjustments DROP CONSTRAINT IF EXISTS price_adjustments_product_id_fkey;
-ALTER TABLE price_model_coefficients DROP CONSTRAINT IF EXISTS price_model_coefficients_product_category_id_fkey;
-ALTER TABLE pricing_features DROP CONSTRAINT IF EXISTS pricing_features_product_id_fkey;
-ALTER TABLE product_metrics DROP CONSTRAINT IF EXISTS product_metrics_product_id_fkey;
-ALTER TABLE products DROP CONSTRAINT IF EXISTS products_category_id_fkey;
-ALTER TABLE products DROP CONSTRAINT IF EXISTS products_brand_id_fkey;
-
 DROP INDEX IF EXISTS idx_products_brand_id;
+DROP INDEX IF EXISTS idx_products_category_id;
 DROP INDEX IF EXISTS idx_products_name;
 DROP INDEX IF EXISTS idx_product_metrics_product_id;
 DROP INDEX IF EXISTS idx_stocks_product_id;
+DROP INDEX IF EXISTS idx_stock_history_product_id;
+DROP INDEX IF EXISTS idx_pricing_features_product_id;
+DROP INDEX IF EXISTS idx_price_adjustments_product_id;
 DROP INDEX IF EXISTS idx_sales_product_id;
 DROP INDEX IF EXISTS idx_reviews_product_id;
 DROP INDEX IF EXISTS idx_reviews_customer_id;
 DROP INDEX IF EXISTS idx_carts_customer_id;
 DROP INDEX IF EXISTS idx_cart_items_cart_id;
+DROP INDEX IF EXISTS idx_cart_items_product_id;
+DROP INDEX IF EXISTS idx_wishlist_items_product_id;
 DROP INDEX IF EXISTS idx_orders_customer_id;
 DROP INDEX IF EXISTS idx_order_items_order_id;
+DROP INDEX IF EXISTS idx_order_items_product_id;
+DROP INDEX IF EXISTS idx_payments_order_id;
 
-DROP TABLE IF EXISTS wishlist_items;
-DROP TABLE IF EXISTS wishlists;
-DROP TABLE IF EXISTS payments;
+-- Drop tables in reverse order of creation (respect foreign key constraints)
 DROP TABLE IF EXISTS sales;
-DROP TABLE IF EXISTS cart_items_history;
+DROP TABLE IF EXISTS payments;
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS wishlist_items;
+DROP TABLE IF EXISTS wishlists;
 DROP TABLE IF EXISTS cart_items;
 DROP TABLE IF EXISTS carts;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS customer_profiles;
 DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS stock_history;
 DROP TABLE IF EXISTS stocks;
+DROP TABLE IF EXISTS price_adjustments;
 DROP TABLE IF EXISTS pricing_features;
 DROP TABLE IF EXISTS price_model_coefficients;
-DROP TABLE IF EXISTS price_adjustments;
 DROP TABLE IF EXISTS product_metrics;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS categories;

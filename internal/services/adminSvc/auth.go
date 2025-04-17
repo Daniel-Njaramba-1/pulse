@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/Daniel-Njaramba-1/pulse/internal/repo"
-	"github.com/Daniel-Njaramba-1/pulse/internal/util/generics"
 	"github.com/Daniel-Njaramba-1/pulse/internal/util/hashing"
 	"github.com/jmoiron/sqlx"
 )
@@ -28,11 +27,17 @@ func (a *Authentication) RegisterAdmin(ctx context.Context, admin *repo.Admin) (
 		return "", nil, err
 	}
 	admin.PasswordHash = hashedPassword
+	admin.IsActive = true
 	admin.Password = ""
 
-	_, err = generics.CreateModel(ctx, a.db, admin)
+	insertAdminQuery := `
+		INSERT INTO admins (username, email, password_hash, is_active)
+		VALUES($1, $2, $3, $4)
+		RETURNING id
+	`
+	err = a.db.QueryRowxContext(ctx, insertAdminQuery, admin.Username, admin.Email, admin.PasswordHash, admin.IsActive).Scan(&admin.Id)
 	if err != nil {
-		return "", nil, err
+		return "",nil, err
 	}
 
 	token, err := CreateAdminToken(admin.Username)
@@ -45,11 +50,12 @@ func (a *Authentication) RegisterAdmin(ctx context.Context, admin *repo.Admin) (
 
 func (a *Authentication) LoginAdmin(ctx context.Context, username string, password string) (string, *repo.Admin, error) {
 	var admin repo.Admin
-	err := repo.GetAdminByNameQuery(ctx, a.db, username, &admin)
-	if err != nil {
-		return "", nil, err
-	}
-	err = repo.GetAdminPasswordQuery(ctx, a.db, username, &admin)
+	getAdminQuery := `
+		SELECT id, username, email, password_hash, is_active
+		FROM admins
+		WHERE username = $1
+	`
+	err := a.db.GetContext(ctx, &admin, getAdminQuery, username)
 	if err != nil {
 		return "", nil, err
 	}
@@ -70,6 +76,3 @@ func (a *Authentication) ResetAdminPassword(ctx context.Context) {
 
 }
 
-func (a *Authentication) ResetCustomerPassword(ctx context.Context) {
-
-}

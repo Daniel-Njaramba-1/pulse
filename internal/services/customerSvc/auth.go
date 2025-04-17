@@ -118,15 +118,8 @@ func (a *Authentication) RegisterCustomer(ctx context.Context, customer *repo.Cu
 
 func (a *Authentication) LoginCustomer(ctx context.Context, username string, password string) (string, *repo.Customer, error) {
 	var customer repo.Customer
-	err := repo.GetCustomerByNameQuery(ctx, a.db, username, &customer)
-	if err != nil {
-		return "", nil, err
-	}
+	// get customer by name and retrieve password
 
-	err = repo.GetCustomerPasswordQuery(ctx, a.db, username, &customer)
-	if err != nil {
-		return "", nil, err
-	}
 
 	if !hashing.VerifyPassword(password, customer.PasswordHash) {
 		return "", nil, errors.New("invalid password")

@@ -17,7 +17,6 @@
 
 
     // Local state
-    let searchQuery = $state<string>("");
     let newProductName = $state<string>("");
     let newProductDescription = $state<string>("");
     let newProductResult = $state("");
@@ -96,8 +95,7 @@
                 newProductDescription = "";
                 imageFile = null;
                 imagePreview = null;
-                // Optionally, refetch products to update the list
-                productHelpers.fetchProducts();
+                goto("/products")
             } else {
                 newProductResult = result.error || "Unknown error occurred";
             }
@@ -155,7 +153,7 @@
 
                 <div class="space-y-2">
                     <Label for="description">Product Description</Label>
-                    <Textarea id="description" class="min-h-[120px]" placeholder="" bind:value={newProductDescription}/>
+                    <Input id="description" class="" placeholder="" bind:value={newProductDescription}/>
                 </div>
 
                 <div class="space-y-4">
