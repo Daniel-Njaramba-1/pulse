@@ -19,6 +19,8 @@
     // Local state
     let newProductName = $state<string>("");
     let newProductDescription = $state<string>("");
+    let newProductBasePrice = $state<number>(0);
+    let newProductInitialStock = $state<number>(0);
     let newProductResult = $state("");
     let newProductLoading = $state<boolean>(false);
     let selectedBrandId = $state<number | null>(null);
@@ -87,6 +89,8 @@
                 selectedCategoryId,
                 newProductName,
                 newProductDescription,
+                newProductBasePrice,
+                newProductInitialStock,
                 imageFile
             );
             if (result.success) {
@@ -112,7 +116,7 @@
     <form onsubmit={handleSubmitNewProduct} class="space-y-8">
         <Card.Root>
             <Card.Header> 
-                <Card.Title class="text-xl font-bold">Add New Product</Card.Title>
+                <Card.Title class="text-l font-bold">Add New Product</Card.Title>
             </Card.Header>
             <Card.Content class="space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -146,14 +150,26 @@
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <Label for="name">Product Name</Label>
+                <div class="space-y-1">
+                    <Label for="name">Name</Label>
                     <Input id="name" class="" placeholder="" bind:value={newProductName}/>
                 </div>
 
-                <div class="space-y-2">
-                    <Label for="description">Product Description</Label>
+                <div class="space-y-1">
+                    <Label for="description">Description</Label>
                     <Input id="description" class="" placeholder="" bind:value={newProductDescription}/>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1">
+                        <Label for="basePrice">Base Price</Label>
+                        <Input id="basePrice" class="" placeholder="" bind:value={newProductBasePrice}/>
+                    </div>
+
+                    <div class="space-y-1">
+                        <Label for="initialStock">Initial Stock</Label>
+                        <Input id="initialStock" class="" placeholder="" bind:value={newProductInitialStock}/>
+                    </div>
                 </div>
 
                 <div class="space-y-4">

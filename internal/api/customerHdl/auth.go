@@ -38,7 +38,7 @@ func (h *AuthHandler) Register(c echo.Context) error {
     })
 }
 
-// Login handles customer login
+// Login handles customer login 
 func (h *AuthHandler) Login(c echo.Context) error {
     var credentials struct {
         Username string `json:"username"`

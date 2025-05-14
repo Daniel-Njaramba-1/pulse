@@ -45,32 +45,7 @@
     
     onMount(fetchBrandDetails);
     
-    // Handle form submission
-    async function handleSubmitEditBrand(event: SubmitEvent) {
-        event.preventDefault();
-        isUpdating = true;
-        updateResult = "";
-        
-        try {
-            const response = await brandHelpers.updateBrand(Number(brandId), brandName, brandDescription);
-            if (response.success) {
-                updateResult = "Brand updated successfully";
-                
-                // Refetch the brand details to ensure we have the most up-to-date data
-                await fetchBrandDetails();
-                
-                // Close dialog after successful update
-                isDialogOpen = false;
-                await tick();
-            } else {
-                updateResult = response.error || "Failed to update brand";
-            }
-        } catch (err) {
-            updateResult = err instanceof Error ? err.message : "An unexpected error occurred";
-        } finally {
-            isUpdating = false;
-        }
-    }
+    
 </script>
 
 <div class="container mx-auto py-3 px-4">

@@ -64,6 +64,7 @@
                         <Table.Head>ID</Table.Head>
                         <Table.Head>Name</Table.Head>
                         <Table.Head>Description</Table.Head>
+                        <Table.Head>Active</Table.Head>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -72,6 +73,7 @@
                         <Table.Cell>{brand.id}</Table.Cell>
                         <Table.Cell>{brand.name}</Table.Cell>
                         <Table.Cell>{brand.description}</Table.Cell>
+                        <Table.Cell>{brand.is_active ? "Yes" : "No"}</Table.Cell>
                     </Table.Row>
                     {/each}
                 </Table.Body>

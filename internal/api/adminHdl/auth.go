@@ -5,7 +5,6 @@ import (
 
 	"github.com/Daniel-Njaramba-1/pulse/internal/repo"
 	"github.com/Daniel-Njaramba-1/pulse/internal/services/adminSvc"
-	"github.com/Daniel-Njaramba-1/pulse/internal/util/logging"
 	"github.com/labstack/echo/v4"
 )
 
@@ -49,13 +48,11 @@ func (h *AuthHandler) Login(c echo.Context) error {
     if err := c.Bind(&credentials); err != nil {
         return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid input"})
     }
-    logging.LogInfo("Attempting to login admin with username %s", credentials.Username)
 
     token, user, err := h.authentication.LoginAdmin(c.Request().Context(), credentials.Username, credentials.Password)
     if err != nil {
         return c.JSON(http.StatusUnauthorized, map[string]string{"error": err.Error()})
     }
-    logging.LogInfo("Admin logged in successfully and returned token: %s ", token)
     return c.JSON(http.StatusOK, map[string]interface{}{
 		"token": token,
 		"user": map[string]interface{}{

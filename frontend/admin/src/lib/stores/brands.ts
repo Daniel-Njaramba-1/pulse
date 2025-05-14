@@ -1,10 +1,12 @@
 import { writable } from "svelte/store";
+import { authHelpers } from "./auth";
 
 // Define interfaces 
 export interface Brand {
     id: number;
     name: string;
     description: string;
+    is_active: boolean
 }
 
 export interface BrandResponse {
@@ -33,6 +35,7 @@ export const brandHelpers = {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
 
@@ -61,6 +64,7 @@ export const brandHelpers = {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
 
@@ -84,6 +88,7 @@ export const brandHelpers = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
                 body: JSON.stringify({ name, description }),
             });
@@ -108,6 +113,7 @@ export const brandHelpers = {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
                 body: JSON.stringify({ id, name, description }),
             });
@@ -132,6 +138,7 @@ export const brandHelpers = {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
 

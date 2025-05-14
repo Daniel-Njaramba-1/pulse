@@ -17,7 +17,7 @@ func NewPaymentService (db *sqlx.DB) *PaymentService {
 	return &PaymentService{db: db}
 }
 
-func (s *PaymentService) GeneratePayment(ctx context.Context, orderId int) (string, error) {
+func (s *PaymentService) ProcessPayment(ctx context.Context, userId int) (string, error) {
 	// Start transaction
 	tx, err := s.db.BeginTxx(ctx, nil)
 	if err != nil {
@@ -30,10 +30,10 @@ func (s *PaymentService) GeneratePayment(ctx context.Context, orderId int) (stri
 	orderQuery := `
 		SELECT *
 		FROM orders
-		WHERE id = $1 AND status = 'pending'
+		WHERE customer_id = $1 AND status = 'pending'
 		FOR UPDATE
 	`
-	err = tx.GetContext(ctx, &order, orderQuery, orderId)
+	err = tx.GetContext(ctx, &order, orderQuery, userId)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve order: %w", err)
 	}
@@ -47,7 +47,7 @@ func (s *PaymentService) GeneratePayment(ctx context.Context, orderId int) (stri
 		SELECT * FROM order_items
 		WHERE order_id = $1
 	`
-	err = tx.SelectContext(ctx, &orderItems, itemsQuery, orderId)
+	err = tx.SelectContext(ctx, &orderItems, itemsQuery, order.Id)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve order items: %w", err)
 	}
@@ -94,7 +94,7 @@ func (s *PaymentService) GeneratePayment(ctx context.Context, orderId int) (stri
 			WHERE id = $3
 		`
 		newValidUntil := time.Now().Add(30 * time.Minute)
-		_, err = tx.ExecContext(ctx, updateOrderQuery, newTotalPrice, newValidUntil, orderId)
+		_, err = tx.ExecContext(ctx, updateOrderQuery, newTotalPrice, newValidUntil, order.Id)
 		if err != nil {
 			return "", fmt.Errorf("failed to update order price: %w", err)
 		}
@@ -124,7 +124,7 @@ func (s *PaymentService) GeneratePayment(ctx context.Context, orderId int) (stri
 	}
 
 	// Create payment record
-	paymentId := "cut the cheque"
+	paymentId := fmt.Sprintf("TXN-%d", time.Now().UnixNano())
 	paymentQuery := `
 		INSERT INTO payments (order_id, payment_method, amount, status, transaction_id)
 		VALUES ($1, $2, $3, $4, $5)
@@ -134,10 +134,10 @@ func (s *PaymentService) GeneratePayment(ctx context.Context, orderId int) (stri
 	err = tx.QueryRowxContext(
 		ctx,
 		paymentQuery,
-		orderId,
-		"credit_card", // This would come from a parameter in a real implementation
+		order.Id,
+		repo.PaymentMethodCard, // This would come from a parameter in a real implementation
 		order.TotalPrice,
-		"success",		// always success for now
+		repo.PaymentStatusSuccess,		// always success for now
 		paymentId,
 	).Scan(&paymentDbId)
 	if err != nil {
@@ -147,9 +147,9 @@ func (s *PaymentService) GeneratePayment(ctx context.Context, orderId int) (stri
 	// Update order status
 	_, err = tx.ExecContext(ctx, `
 		UPDATE orders 
-		SET status = 'completed' 
+		SET status = $2 
 		WHERE id = $1
-	`, orderId)
+	`, order.Id, repo.OrderStatusCompleted)
 	if err != nil {
 		return "", fmt.Errorf("failed to update order status: %w", err)
 	}
@@ -186,17 +186,17 @@ func (s *PaymentService) GeneratePayment(ctx context.Context, orderId int) (stri
 		}
 		
 		// Record stock history
-		_, err = tx.ExecContext(ctx, `
-			INSERT INTO stock_history (
-				product_id, event_type, quantity_change, quantity_after
-			) SELECT 
-				$1, 'sale', -$2, 
-				(SELECT quantity FROM stocks WHERE product_id = $1)
-			FROM stocks WHERE product_id = $1
-		`, item.ProductId, item.Quantity)
-		if err != nil {
-			return "", fmt.Errorf("failed to record stock history: %w", err)
-		}
+		// _, err = tx.ExecContext(ctx, `
+		// 	INSERT INTO stock_history (
+		// 		product_id, event_type, quantity_change, quantity_after
+		// 	) SELECT 
+		// 		$1, 'sale', -$2, 
+		// 		(SELECT quantity FROM stocks WHERE product_id = $1)
+		// 	FROM stocks WHERE product_id = $1
+		// `, item.ProductId, item.Quantity)
+		// if err != nil {
+		// 	return "", fmt.Errorf("failed to record stock history: %w", err)
+		// }
 	}
 
 	// Commit the transaction

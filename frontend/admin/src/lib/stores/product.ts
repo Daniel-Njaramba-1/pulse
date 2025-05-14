@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+import { authHelpers } from "./auth";
 
 export interface Product {
     id: number;
@@ -7,13 +8,50 @@ export interface Product {
     name: string;
     description: string;
     image: File;
-    imagePath: string;
-    isActive: boolean;
+    image_path: string;
+    is_active: boolean;
+    base_price: number
+}
+
+export interface ProductDetail {
+    // Basic product information
+    id: number;
+    name: string;
+    description: string | null;
+    image_path: string | null;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+
+    // Associated brand information
+    brand_id: number;
+    brand_name: string;
+
+    // Associated category information
+    category_id: number;
+    category_name: string;
+
+    // Product metrics
+    average_rating: number | null;
+    review_count: number | null;
+    wishlist_count: number | null;
+    base_price: number | null;
+    adjusted_price: number | null;
+
+    // Stock information
+    stock_quantity: number | null;
+    stock_threshold: number | null;
 }
 
 export interface ProductResponse {
     success: boolean;
     data?: Product | Product[];
+    error?: string;
+}
+
+export interface ProductDetailResponse {
+    success: boolean;
+    data?: ProductDetail | ProductDetail[];
     error?: string;
 }
 
@@ -30,10 +68,11 @@ export const productHelpers = {
         error.set(null);
         
         try {
-            const response = await fetch (`${API_BASE_URL}/products`, {
+            const response = await fetch(`${API_BASE_URL}/products`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
             
@@ -55,12 +94,13 @@ export const productHelpers = {
         }
     },
 
-    getProduct: async(id: number): Promise<ProductResponse> => {
+    getProduct: async(id: number): Promise<ProductDetailResponse> => {
         try {
             const response = await fetch(`${API_BASE_URL}/products/${id}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
 
@@ -69,7 +109,7 @@ export const productHelpers = {
                 return { success: false, error: errorData.message || "Failed to fetch product." };
             }
 
-            const data: Product = await response.json();
+            const data: ProductDetail = await response.json();
             return { success: true, data };
         } catch (err) {
             console.error("Error fetching product:", err);
@@ -77,7 +117,7 @@ export const productHelpers = {
         }
     },
 
-    createProduct: async(brandId:number, categoryId:number, name:string, description: string, image: File | null): Promise<ProductResponse> => {
+    createProduct: async(brandId:number, categoryId:number, name:string, description: string, base_price:number, initial_stock:number, image: File | null): Promise<ProductResponse> => {
         isLoading.set(true);
         error.set(null);
         
@@ -88,6 +128,8 @@ export const productHelpers = {
             formData.append("category_id", categoryId.toString());
             formData.append("name", name);
             formData.append("description", description);
+            formData.append("base_price", base_price.toString())
+            formData.append("initial_stock", initial_stock.toString());
             if (image) {
                 formData.append("image", image);
             }
@@ -97,6 +139,9 @@ export const productHelpers = {
             
             const response = await fetch(`${API_BASE_URL}/products`, {
                 method: "POST",
+                headers: {
+                    ...authHelpers.getAuthHeader()
+                },
                 body: formData
             });
             
@@ -117,41 +162,137 @@ export const productHelpers = {
         }
     },
 
-    updateProduct: async(id: number, brand:any, category:any, name:string, description: string, image:any): Promise<ProductResponse> => {
+    updateProductDetails: async(id: number, brandId: number, categoryId: number, name: string, description: string, is_active: boolean): Promise<ProductResponse> => {
         isLoading.set(true);
         error.set(null);
         
         try {
-            // Create FormData object to handle file uploads
-            const formData = new FormData();
-            formData.append("brand", typeof brand === 'object' ? brand.id.toString() : brand.toString());
-            formData.append("category", typeof category === 'object' ? category.id.toString() : category.toString());
-            formData.append("name", name);
-            formData.append("description", description);
+            const payload = {
+                id: id,
+                brand_id: brandId,
+                category_id: categoryId,
+                name,
+                description,
+                is_active
+            };
             
-            // Only append image if it exists and is a new file
-            if (image instanceof File) {
-                formData.append("image", image);
+            const response = await fetch(`${API_BASE_URL}/products/${id}/details`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                error.set(errorData.error || "Failed to update product details");
+                return { success: false, error: errorData.error };
             }
             
-            const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+            const data: Product = await response.json();
+            return { success: true, data };
+        } catch (err) {
+            console.error("Error updating product details:", err);
+            error.set("An error occurred while updating the product details");
+            return { success: false, error: "An error occurred while updating the product details" };
+        } finally {
+            isLoading.set(false);
+        }
+    },
+
+    updateProductImage: async(id: number, image: File): Promise<ProductResponse> => {
+        isLoading.set(true);
+        error.set(null);
+        
+        try {
+            // Create FormData object to handle file upload
+            const formData = new FormData();
+            formData.append("image", image);
+            
+            const response = await fetch(`${API_BASE_URL}/products/${id}/image`, {
                 method: "PUT",
+                headers: {
+                    ...authHelpers.getAuthHeader()
+                },
                 body: formData
             });
             
             if (!response.ok) {
                 const errorData = await response.json();
-                error.set(errorData.error || "Failed to update product");
+                error.set(errorData.error || "Failed to update product image");
                 return { success: false, error: errorData.error };
             }
             
             const data: Product = await response.json();
-
             return { success: true, data };
         } catch (err) {
-            console.error("Error updating product:", err);
-            error.set("An error occurred while updating the product");
-            return { success: false, error: "An error occurred while updating the product" };
+            console.error("Error updating product image:", err);
+            error.set("An error occurred while updating the product image");
+            return { success: false, error: "An error occurred while updating the product image" };
+        } finally {
+            isLoading.set(false);
+        }
+    },
+    
+    restock: async(id: number, quantity: number): Promise<ProductResponse> => {
+        isLoading.set(true);
+        error.set(null);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/products/${id}/restock`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
+                },
+                body: JSON.stringify({ id, quantity })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                error.set(errorData.error || "Failed to add product stock");
+                return { success: false, error: errorData.error };
+            }
+            
+            const data = await response.json();
+            return { success: true, data };
+        } catch (err) {
+            console.error("Error adding product stock:", err);
+            error.set("An error occurred while adding product stock");
+            return { success: false, error: "An error occurred while adding product stock" };
+        } finally {
+            isLoading.set(false);
+        }
+    },
+
+    updateBasePrice: async(id: number, base_price: number): Promise<ProductResponse> => {
+        isLoading.set(true);
+        error.set(null);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/products/${id}/reprice`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
+                },
+                body: JSON.stringify({ id, base_price })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                error.set(errorData.error || "Failed to update product price");
+                return { success: false, error: errorData.error };
+            }
+            
+            const data = await response.json();
+            return { success: true, data };
+        } catch (err) {
+            console.error("Error updating product price:", err);
+            error.set("An error occurred while updating the product price");
+            return { success: false, error: "An error occurred while updating the product price" };
         } finally {
             isLoading.set(false);
         }
@@ -166,6 +307,7 @@ export const productHelpers = {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
             
@@ -194,6 +336,7 @@ export const productHelpers = {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
             
@@ -204,7 +347,7 @@ export const productHelpers = {
             }
             products.update(currentProducts => 
                 currentProducts.map(product => 
-                    product.id === id ? { ...product, isActive: false } : product
+                    product.id === id ? { ...product, is_active: false } : product
                 )
             );
             return { success: true };
@@ -226,6 +369,7 @@ export const productHelpers = {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
             
@@ -238,7 +382,7 @@ export const productHelpers = {
             // Update the product's status in the store
             products.update(currentProducts => 
                 currentProducts.map(product => 
-                    product.id === id ? { ...product, isActive: true } : product
+                    product.id === id ? { ...product, is_active: true } : product
                 )
             );
             

@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS admins (
 	email VARCHAR(255) NOT NULL UNIQUE,
 	password_hash TEXT NOT NULL,
 	is_active BOOLEAN NOT NULL,
+    is_email_verified BOOLEAN,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -144,6 +145,7 @@ CREATE TABLE IF NOT EXISTS customers (
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     is_active BOOLEAN,
+    is_email_verified BOOLEAN,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

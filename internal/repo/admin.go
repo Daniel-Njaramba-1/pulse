@@ -11,6 +11,7 @@ type Admin struct {
     PasswordHash	string		`db:"password_hash" json:"-"`
     Password        string      `db:"-" json:"password"` 
     IsActive		bool		`db:"is_active" json:"is_active"`
+    IsEmailVerified bool        `db:"is_email_verified"`
     CreatedAt		time.Time	`db:"created_at" json:"created_at"`
     UpdatedAt		time.Time	`db:"updated_at" json:"updated_at"`
 }

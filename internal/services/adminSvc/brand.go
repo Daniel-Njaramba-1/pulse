@@ -41,7 +41,7 @@ func (s *BrandService) CreateBrand(ctx context.Context, brand *repo.Brand) (*rep
 func (s *BrandService) GetBrandByID(ctx context.Context, id int) (*repo.Brand, error) {
     var brand repo.Brand
     query := `
-        SELECT id, name, description
+        SELECT *
         FROM brands
         WHERE id = $1
     `
@@ -59,7 +59,7 @@ func (s *BrandService) GetBrandByID(ctx context.Context, id int) (*repo.Brand, e
 func (s *BrandService) GetAllBrands(ctx context.Context) ([]*repo.Brand, error) {
     var brands []*repo.Brand
     query := `
-        SELECT id, name, description
+        SELECT *
         FROM brands
     `
     err := s.db.SelectContext(ctx, &brands, query)

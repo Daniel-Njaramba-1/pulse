@@ -55,7 +55,7 @@
 <div class="flex justify-center items-center min-h-screen bg-gray-100">
     <Card.Root class="w-full max-w-md shadow-lg">
         <Card.Header class="space-y-1">
-            <Card.Title class="text-2xl text-center">Login</Card.Title>
+            <Card.Title class="text-2xl text-center">Admin Register</Card.Title>
             <Card.Description class="text-center text-gray-500">
                 Input details to create your account
             </Card.Description>

@@ -11,14 +11,15 @@ import (
 var customerKey = []byte(config.GetEnv("CUSTOMER_KEY"))
 
 type CustomerClaims struct {
-	ID int `json:"id"`
+	Id int `json:"id"`
 	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
 
-func CreateCustomerToken(username string) (string, error) {
-	expirationTime := time.Now().Add(time.Hour * 24)
+func CreateCustomerToken(id int, username string) (string, error) {
+	expirationTime := time.Now().Add(time.Hour * 24 * 365)
 	claims := CustomerClaims{
+		Id: id,
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),

@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+import { authHelpers } from "./auth";
 
 export interface Category {
     id: number;
@@ -35,6 +36,7 @@ export const categoryHelpers = {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
 
@@ -63,6 +65,7 @@ export const categoryHelpers = {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
 
@@ -86,6 +89,7 @@ export const categoryHelpers = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
                 body: JSON.stringify({ name, description}),
             });
@@ -110,6 +114,7 @@ export const categoryHelpers = {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
                 body: JSON.stringify({ id, name, description, is_active }),
             });
@@ -134,6 +139,7 @@ export const categoryHelpers = {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
                 },
             });
 

@@ -15,6 +15,12 @@ type AdminServices struct {
 
 type CustomerServices struct {
 	authentication *customerSvc.Authentication
+	productService *customerSvc.ProductService
+	cartService *customerSvc.CartService
+	orderService *customerSvc.OrderService
+	paymentService *customerSvc.PaymentService
+	reviewService *customerSvc.ReviewService
+	wishlistService *customerSvc.WishlistService
 }
 
 func NewAdminServices(db *sqlx.DB) *AdminServices {
@@ -32,7 +38,22 @@ func NewAdminServices(db *sqlx.DB) *AdminServices {
 }
 
 func NewCustomerServices(db *sqlx.DB) *CustomerServices {
+	authentication := customerSvc.NewAuthentication(db)
+	productService := customerSvc.NewProductService(db)
+	cartService := customerSvc.NewCartService(db)
+	orderService := customerSvc.NewOrderService(db)
+	paymentService := customerSvc.NewPaymentService(db)
+	reviewService := customerSvc.NewReviewService(db)
+	wishlistService := customerSvc.NewWishlistService(db)
+
+
 	return &CustomerServices{
-		authentication: customerSvc.NewAuthentication(db),
+		authentication: authentication,
+		productService: productService,
+		cartService: cartService,
+		orderService: orderService,
+		paymentService: paymentService,
+		reviewService: reviewService,
+		wishlistService: wishlistService,
 	}
 }

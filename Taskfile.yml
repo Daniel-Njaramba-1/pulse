@@ -28,11 +28,17 @@ tasks:
     cmds:
       - go run cmd/main.go
 
+  start-test:
+    desc: Testing Price
+    dir: 
+    cmds:
+      - go run cmd/main.go -test
+
   start-admin:
     desc: Start the admin dashboard
     dir: frontend/admin
     cmds:
-      - bun run dev
+      - npm run dev
 
   start-customer:
     desc: Start the customer shop

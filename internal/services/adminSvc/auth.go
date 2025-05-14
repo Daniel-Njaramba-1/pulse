@@ -31,8 +31,8 @@ func (a *Authentication) RegisterAdmin(ctx context.Context, admin *repo.Admin) (
 	admin.Password = ""
 
 	insertAdminQuery := `
-		INSERT INTO admins (username, email, password_hash, is_active)
-		VALUES($1, $2, $3, $4)
+		INSERT INTO admins (username, email, password_hash, is_active, is_email_verified)
+		VALUES($1, $2, $3, $4, FALSE)
 		RETURNING id
 	`
 	err = a.db.QueryRowxContext(ctx, insertAdminQuery, admin.Username, admin.Email, admin.PasswordHash, admin.IsActive).Scan(&admin.Id)
@@ -40,7 +40,7 @@ func (a *Authentication) RegisterAdmin(ctx context.Context, admin *repo.Admin) (
 		return "",nil, err
 	}
 
-	token, err := CreateAdminToken(admin.Username)
+	token, err := CreateAdminToken(admin.Id, admin.Username)
 	if err != nil {
 		return "", nil, err
 	}
@@ -64,7 +64,7 @@ func (a *Authentication) LoginAdmin(ctx context.Context, username string, passwo
 		return "", nil, errors.New("invalid password")
 	}
 
-	token, err := CreateAdminToken(admin.Username)
+	token, err := CreateAdminToken(admin.Id, admin.Username)
 	if err != nil {
 		return "", nil, err
 	}

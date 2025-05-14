@@ -11,13 +11,15 @@ import (
 var adminKey = []byte(config.GetEnv("ADMIN_KEY"))
 
 type AdminClaims struct {
+	Id int `json:"id"`
 	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
 
-func CreateAdminToken(username string) (string, error) {
-	expirationTime := time.Now().Add(time.Hour * 24)
+func CreateAdminToken(id int, username string) (string, error) {
+	expirationTime := time.Now().Add(time.Hour * 24 * 365) // 365 days
 	claims := AdminClaims{
+		Id: id,
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),

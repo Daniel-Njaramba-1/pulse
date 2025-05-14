@@ -3,6 +3,7 @@
     import { goto } from "$app/navigation";
     import * as Card from "$lib/components/ui/card/index";
     import { Button } from "$lib/components/ui/button/index";
+    import * as Table from "$lib/components/ui/table/index";
     import { Input } from "$lib/components/ui/input/index";
     import { Search } from "lucide-svelte";
     import { products, isLoading, error, productHelpers } from "$lib/stores/product";
@@ -53,12 +54,26 @@
         <div class="border border-red-300 bg-red-50 p-4 rounded-lg text-red-800">
             Error: {$error}
         </div>
-    {:else}        
-        <!-- Grid of product cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-            {#each $products as product (product.id)}
-                <!-- imagine some silly card here -->
-            {/each}
-        </div>
+    {:else}
+        <Table.Root>
+            <Table.Header>
+                <Table.Row class="bg-gray-100">
+                    <Table.Head>ID</Table.Head>
+                    <Table.Head>Name</Table.Head>
+                    <Table.Head>Description</Table.Head>
+                    <Table.Head>Active</Table.Head>
+                </Table.Row>
+            </Table.Header>
+            <Table.Body>
+                {#each $products as product (product.id)}
+                <Table.Row class="hover:bg-gray-50 cursor-pointer" data-id={product.id} onclick={() => goto(`/products/${product.id}`, { state: { product } })}>
+                    <Table.Cell>{product.id}</Table.Cell>
+                    <Table.Cell>{product.name}</Table.Cell>
+                    <Table.Cell>{product.description}</Table.Cell>
+                    <Table.Cell>{product.is_active ? "Yes" : "No"}</Table.Cell>
+                </Table.Row>
+                {/each}
+            </Table.Body>
+        </Table.Root>
     {/if}
 </div>

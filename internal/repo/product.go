@@ -11,7 +11,7 @@ type Product struct {
 	BrandId			int			`db:"brand_id" json:"brand_id"`
 	Name			string		`db:"name" json:"name"`
 	Description		string		`db:"description" json:"description"`
-	ImagePath		string		`db:"image_path" json:"image_path"`
+	ImagePath		*string		`db:"image_path" json:"image_path"` //pointer to handle null values
 	IsActive		bool		`db:"is_active" json:"is_active"` 
 	CreatedAt		time.Time	`db:"created_at" json:"created_at"`
 	UpdatedAt		time.Time	`db:"updated_at" json:"updated_at"`
@@ -77,10 +77,10 @@ type ProductDetail struct {
     Id          int       `db:"id" json:"id"`
     Name        string    `db:"name" json:"name"`
     Description string    `db:"description" json:"description"`
-    ImagePath   string    `db:"image_path" json:"image_path"`
+    ImagePath   *string    `db:"image_path" json:"image_path"`
     IsActive    bool      `db:"is_active" json:"is_active"`
-    CreatedAt   time.Time `db:"created_at" json:"created_at"`
-    UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
+    // CreatedAt   time.Time `db:"created_at" json:"created_at"`
+    // UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 
     // Associated brand information
     BrandId   int    `db:"brand_id" json:"brand_id"`
@@ -91,13 +91,13 @@ type ProductDetail struct {
     CategoryName string `db:"category_name" json:"category_name"`
 
     // Product metrics
-    AverageRating  float32 `db:"average_rating" json:"average_rating"`
-    ReviewCount    int     `db:"review_count" json:"review_count"`
-    WishlistCount  int     `db:"wishlist_count" json:"wishlist_count"`
-    BasePrice      float32 `db:"base_price" json:"base_price"`
-    AdjustedPrice  float32 `db:"adjusted_price" json:"adjusted_price"`
+    AverageRating  *float32 `db:"average_rating" json:"average_rating"`
+    ReviewCount    *int     `db:"review_count" json:"review_count"`
+    WishlistCount  *int     `db:"wishlist_count" json:"wishlist_count"`
+    BasePrice      *float32 `db:"base_price" json:"base_price"`
+    AdjustedPrice  *float32 `db:"adjusted_price" json:"adjusted_price"`
 
     // Stock information
-    StockQuantity    int `db:"stock_quantity" json:"stock_quantity"`
-    StockThreshold   int `db:"stock_threshold" json:"stock_threshold"`
+    StockQuantity    *int `db:"stock_quantity" json:"stock_quantity"`
+    StockThreshold   *int `db:"stock_threshold" json:"stock_threshold"`
 }

@@ -15,7 +15,7 @@ var (
 // Initialize logging
 func InitLogging() {
     var err error
-    logFile, err = os.OpenFile("internal/util/logging/log.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+    logFile, err = os.OpenFile("internal/util/logging/log2.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
     if err != nil {
         log.Fatalf("Failed to open log file: %v", err)
     }

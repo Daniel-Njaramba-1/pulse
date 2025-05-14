@@ -8,19 +8,18 @@ import (
 
 func main() {
 	config.LoadEnv()
-
 	logging.InitLogging()
 	defer logging.CloseLogging()
 
 	app, err := app.NewApp()
 	if err != nil {
-		logging.LogError("Failed to serve app: %v", err)
+		logging.LogError("Failed to create app: %v", err)
 		return
 	}
 	defer app.Close()
 
+	// Otherwise, start the server normally
 	if err := app.Start(); err != nil {
 		logging.LogError("Failed to start server: %v", err)
 	}
-
 }

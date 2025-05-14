@@ -1,0 +1,17 @@
+[INFO] 2025/05/14 16:08:17 logging.go:31: Order generation started
+[INFO] 2025/05/14 16:08:17 logging.go:31: Cart ID 1 found for user 1
+[ERROR] 2025/05/14 16:08:17 logging.go:36: Error checking for existing order for user 1: pq: column "pending" does not exist
+[INFO] 2025/05/14 16:09:07 logging.go:31: Order generation started
+[INFO] 2025/05/14 16:09:07 logging.go:31: Cart ID 1 found for user 1
+[ERROR] 2025/05/14 16:09:07 logging.go:36: Error checking for existing order for user 1: pq: column "pending" does not exist
+[INFO] 2025/05/14 16:12:12 logging.go:31: Order generation started
+[INFO] 2025/05/14 16:12:12 logging.go:31: Cart ID 1 found for user 1
+[ERROR] 2025/05/14 16:12:12 logging.go:36: Error checking for existing order for user 1: pq: column "pending" does not exist
+[INFO] 2025/05/14 16:16:24 logging.go:31: Order generation started
+[INFO] 2025/05/14 16:16:24 logging.go:31: Cart ID 1 found for user 1
+[INFO] 2025/05/14 16:16:24 logging.go:31: No pending order found for user 1
+[INFO] 2025/05/14 16:16:24 logging.go:31: Added product 1 (qty 1, price 1199.99) to order
+[INFO] 2025/05/14 16:16:24 logging.go:31: Order 1 created for user 1
+[INFO] 2025/05/14 16:16:24 logging.go:31: Order item for product 1 added to order 1
+[INFO] 2025/05/14 16:16:24 logging.go:31: Cart items for cart 1 marked as processed
+[INFO] 2025/05/14 16:16:24 logging.go:31: Order generation completed successfully for user 1

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Daniel-Njaramba-1/pulse/internal/services/adminSvc"
 	"github.com/Daniel-Njaramba-1/pulse/internal/services/customerSvc"
+	"github.com/Daniel-Njaramba-1/pulse/internal/util/logging"
 	"github.com/labstack/echo/v4"
 )
 
@@ -14,15 +15,18 @@ func AdminAuthMiddleware() echo.MiddlewareFunc {
 		return func (c echo.Context) error {
 			authHeader := c.Request().Header.Get("Authorization")
 			if authHeader == "" {
+				logging.LogError("Authorization header is missing")
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Unauthorized"})
 			}
 			parts := strings.Split(authHeader, " ")
 			if len(parts) != 2 || parts[0] != "Bearer" {
+				logging.LogError("Invalid authorization format")
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid authorization format"})
 			}
 			tokenString := parts[1]
 			claims, err := adminSvc.VerifyAdminToken(tokenString)
 			if err != nil {
+				logging.LogError("Invalid token: %v", err)
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid token"})
 			}
 			c.Set("username", claims.Username)
@@ -48,6 +52,7 @@ func CustomerAuthMiddleware() echo.MiddlewareFunc {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid token"})
 			}
 			c.Set("username", claims.Username)
+			c.Set("userId", claims.Id)
 			return next(c)
 		}
 	}

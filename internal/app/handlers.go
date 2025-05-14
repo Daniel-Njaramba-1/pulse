@@ -14,6 +14,12 @@ type AdminHdl struct {
 
 type CustomerHdl struct {
 	AuthHandler *customerHdl.AuthHandler
+	ProductHandler *customerHdl.ProductHandler
+	CartHandler *customerHdl.CartHandler
+	OrderHandler *customerHdl.OrderHandler
+	PaymentHandler *customerHdl.PaymentHandler
+	ReviewHandler *customerHdl.ReviewHandler
+	WishlistHandler *customerHdl.WishlistHandler
 }
 
 func NewAdminHdl(adminSvc *AdminServices) *AdminHdl {
@@ -28,5 +34,11 @@ func NewAdminHdl(adminSvc *AdminServices) *AdminHdl {
 func NewCustomerHdl(customerSvc *CustomerServices) *CustomerHdl {
 	return &CustomerHdl{
 		AuthHandler: customerHdl.NewAuthHandler(customerSvc.authentication),
+		ProductHandler: customerHdl.NewProductHandler(customerSvc.productService),
+		CartHandler: customerHdl.NewCartHandler(customerSvc.cartService),
+		OrderHandler: customerHdl.NewOrderHandler(customerSvc.orderService),
+		PaymentHandler: customerHdl.NewPaymentHandler(customerSvc.paymentService),
+		ReviewHandler: customerHdl.NewReviewHandler(customerSvc.reviewService),
+		WishlistHandler: customerHdl.NewWishlistHandler(customerSvc.wishlistService),
 	}
 }

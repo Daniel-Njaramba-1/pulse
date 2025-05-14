@@ -29,7 +29,7 @@ interface RegisterResponse {
     error?: string;
 }
 
-function setCookie(name:string, value:string, days:number = 7) {
+function setCookie(name:string, value:string, days:number = 365) {
     if (!browser) return;
     const expires = new Date(Date.now() + days * 86400000).toUTCString();
     document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Strict`;

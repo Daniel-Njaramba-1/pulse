@@ -2,46 +2,73 @@ package app
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/Daniel-Njaramba-1/pulse/internal/db"
 	"github.com/Daniel-Njaramba-1/pulse/internal/pricing"
-	"github.com/Daniel-Njaramba-1/pulse/internal/repo"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
+// App represents the application with its dependencies
 type App struct {
-	db *sqlx.DB
-	echo *echo.Echo
-	pricingModel *pricing.ModelService
+	db            *sqlx.DB
+	echo          *echo.Echo
+	pricingModel  *pricing.ModelService
+	dbConfig      *db.DBConfig
 }
 
+// NewApp initializes and returns a new app instance
 func NewApp() (*App, error) {
-	db, err := db.ConnDB()
+	ctx := context.Background()
+	
+	dbConfig, err := db.LoadDBConfig()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load DB config: %w", err)
+	}
+	
+	database, err := db.InitDB(ctx, dbConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize database: %w", err)
 	}
 
+	// Start client manager in a goroutine
+	go db.Manager.Run()
+	
+	// Start price adjustment listener in a goroutine
+	connStr := db.BuildConnStr(dbConfig)
+	go db.StartPriceAdjustmentListener(connStr)
+
+	// Initialize Echo framework
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:5173", "http://localhost:5174"},
-		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowOrigins: []string{"http://localhost:5190", "http://localhost:5195"},
+		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.OPTIONS},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderCookie},
+		AllowCredentials: true,
 	}))
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	// Set up SSE endpoint
+	e.GET("/api/price-adjustments", HandleSSE)
 	
-	pricingModel := pricing.NewModelService(db)
-	err = initializePricingModel(pricingModel)
-	if err != nil {
+	// Initialize pricing model
+	pricingModel := pricing.NewModelService(database)
+	if err := InitializePricingModel(ctx, pricingModel); err != nil {
 		log.Printf("Error initializing pricing model: %v", err)
 	}
 
-	adminServices := NewAdminServices(db)
-	customerServices := NewCustomerServices(db)
+	// Set up service handlers
+	adminServices := NewAdminServices(database)
+	customerServices := NewCustomerServices(database)
 
 	adminHandlers := NewAdminHdl(adminServices)
 	customerHandlers := NewCustomerHdl(customerServices)
@@ -49,89 +76,106 @@ func NewApp() (*App, error) {
 	AdminRoutes(e, adminHandlers)
 	CustomerRoutes(e, customerHandlers)
 
-	// product images are in filepath.Join (os.Getwd() "internal", "assets", "products")
-	rootDir, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("Error getting current working directory: %v", err)
-	}
-	e.Static("/assets/products", filepath.Join(rootDir, "internal", "assets", "products"))
+	// Set up static file serving for product images using Go's built-in file server
+    rootDir, err := os.Getwd()
+    if err != nil {
+        log.Printf("Error getting current working directory: %v", err)
+    } else {
+        // Create a file server handler
+        productImagesPath := filepath.Join(rootDir, "internal", "assets", "products")
+        fs := http.FileServer(http.Dir(productImagesPath))
+        
+        // Register the handler with Echo
+        e.GET("/assets/products/*", echo.WrapHandler(http.StripPrefix("/assets/products/", fs)))
+        log.Printf("Serving static files from: %s", productImagesPath)
+    }
 	
-	// start price adjustment
-	go startPriceAdjustmentScheduler(pricingModel)
+	// Start Price Adjustment
+	go db.StartSaleListener(connStr, pricingModel)
+	// Start schedulers
+	go StartPriceAdjustmentScheduler(pricingModel)
+	go StartModelTrainingScheduler(pricingModel)
 	
 	return &App{
-		db: db,
-		echo: e,
+		db:           database,
+		echo:         e,
 		pricingModel: pricingModel,
+		dbConfig:     dbConfig,
 	}, nil
 }
 
+// Start begins listening for HTTP requests
 func (a *App) Start() error {
 	return a.echo.Start(":8080")
 }
 
-func (a *App) Close () {
+// Close properly shuts down the application
+func (a *App) Close() {
 	if a.db != nil {
-		a.db.Close()
+		db.CloseDB(a.db)
 	}
 }
 
-func initializePricingModel(modelService *pricing.ModelService) error {
-	ctx := context.Background()
-
-	coeffs, err := modelService.GetLatestModelCoefficients(ctx)
-	if err != nil {
-		log.Printf("No existing model coefficients found, initializing with seed data")
-
-		seedCoeffs := repo.PriceModelCoefficients{
-			ModelVersion: "v1.0",
-			TrainingDate: time.Now(),
-			SampleSize: 0,
-			RSquared: 0.0,
-			Intercept: 100.0,
-			SalesCountCoef: 0.5,
-			SalesValueCoef: 0.01,
-			SalesVelocityCoef: 2.0,
-			DaysSinceSaleCoef: -0.1,
-			CategoryRankCoef: -0.5,
-			CategoryPercentileCoef: 0.3,
-			ReviewScoreCoef: 5.0,
-			WishlistRatioCoef: 2.0,
-			DaysInStockCoef: -0.05,
-			SeasonalFactorCoef: 10.0,
-		}
-
-		err = modelService.SaveModelCoefficients(ctx, seedCoeffs)
-		if err != nil {
-			return err
-		}
-
-		log.Printf("Succesfully initiated pricing model with seed data")
-		return nil
-	}
-
-	log.Printf("Found existing model coefficients (version: %s)", coeffs.ModelVersion)
-	return nil
-}
-
-// Start a background goroutine to periodically adjust prices
-func startPriceAdjustmentScheduler(modelService *pricing.ModelService) {
-	ticker := time.NewTicker(24 * time.Hour) // Adjust prices once per day
-	go func() {
-		log.Printf("Starting price adjustment scheduler")
-		for range ticker.C {
-			ctx := context.Background()
-			log.Printf("Running scheduled price adjustments")
-			
-			// Run price adjustments for all active products
-			err := modelService.AdjustAllPrices(ctx)
-			if err != nil {
-				log.Printf("Error during scheduled price adjustment: %v", err)
-			} else {
-				log.Printf("Scheduled price adjustments completed successfully")
-			}
-		}
-	}()
+// GetDB returns the database connection
+func (a *App) GetDB() *sqlx.DB {
+	return a.db
 }
 
 
+
+// HandleSSE handles Server-Sent Events connections
+func HandleSSE(c echo.Context) error {
+	c.Response().Header().Set("Content-Type", "text/event-stream")
+    c.Response().Header().Set("Cache-Control", "no-cache")
+    c.Response().Header().Set("Connection", "keep-alive")
+    c.Response().Header().Set("Access-Control-Allow-Origin", "*")
+
+	c.Response().WriteHeader(http.StatusOK)
+
+	initialData := map[string]string{
+        "type": "connection",
+        "status": "established",
+        "timestamp": fmt.Sprintf("%d", time.Now().Unix()),
+    }
+    initialJSON, _ := json.Marshal(initialData)
+    fmt.Fprintf(c.Response().Writer, "event: connect\ndata: %s\n\n", initialJSON)
+    c.Response().Flush()
+	log.Printf("SSE client connected from %s", c.Request().RemoteAddr)
+
+    // Each client gets its own channel
+    messageChan := make(chan string)
+    
+    // Register this client
+    db.Manager.RegisterChannel(messageChan)
+    
+    // Ensure client is unregistered when connection closes
+    defer func() {
+        db.Manager.UnregisterChannel(messageChan)
+    }()
+
+	// Send a heartbeat every 30 seconds to keep connection alive
+	heartbeat := time.NewTicker(30 * time.Second)
+    defer heartbeat.Stop()
+    
+    // Keep connection open
+    for {
+        select {
+        case msg := <-messageChan:
+            // Format as SSE
+            if _, err := fmt.Fprintf(c.Response().Writer, "data: %s\n\n", msg); err != nil {
+                return err
+            }
+            c.Response().Flush()
+		case <-heartbeat.C:
+            // Send heartbeat comment to keep connection alive
+            if _, err := fmt.Fprintf(c.Response().Writer, ": heartbeat %v\n\n", time.Now().Unix()); err != nil {
+                log.Printf("Error sending SSE heartbeat: %v", err)
+                return err
+            }
+            c.Response().Flush()
+        case <-c.Request().Context().Done():
+            log.Printf("SSE client connection closed")
+			return nil
+        }
+    }
+}

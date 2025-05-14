@@ -7,7 +7,14 @@ type PaymentStatus string
 const (
 	PaymentStatusPending	PaymentStatus = "pending"
 	PaymentStatusFailed 	PaymentStatus = "failed"
-	PaymentStatusCompleted 	PaymentStatus = "completed"
+	PaymentStatusSuccess 	PaymentStatus = "success"
+)
+
+type PaymentMethod string
+
+const (
+	PaymentMethodCard    PaymentMethod = "credit_card"
+	PaymentMethodMpesa   PaymentMethod = "m-pesa"
 )
 
 type Payment struct {

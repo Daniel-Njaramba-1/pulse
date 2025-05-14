@@ -38,7 +38,7 @@ func (s *CategoryService) CreateCategory(ctx context.Context, category *repo.Cat
 func (s *CategoryService) GetCategoryByID(ctx context.Context, id int) (*repo.Category, error) {
     var category repo.Category
     query := `
-        SELECT id, name, description
+        SELECT *
         FROM categories
         WHERE id = $1
     `
@@ -52,7 +52,7 @@ func (s *CategoryService) GetCategoryByID(ctx context.Context, id int) (*repo.Ca
 func (s *CategoryService) GetAllCategories(ctx context.Context) ([]*repo.Category, error) {
     var categories []*repo.Category
     query := `
-        SELECT id, name, description
+        SELECT *
         FROM categories
     `
     err := s.db.SelectContext(ctx, &categories, query)

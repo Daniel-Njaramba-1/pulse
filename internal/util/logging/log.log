@@ -1,0 +1,62 @@
+[INFO] 2025/04/17 15:59:57 logging.go:31: Running in test mode - testing price adjustment
+[INFO] 2025/04/17 15:59:57 logging.go:31: Product: Galaxy S23 (ID: 1)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Current Price: $949.99
+[INFO] 2025/04/17 15:59:57 logging.go:31:   New Price: $7021.26
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Price Change: $6071.27 (639.09%)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Confidence Score: 0.85
+[INFO] 2025/04/17 15:59:57 logging.go:31: ----------------------------------------
+[INFO] 2025/04/17 15:59:57 logging.go:31: Product: iPhone 15 (ID: 2)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Current Price: $1079.99
+[INFO] 2025/04/17 15:59:57 logging.go:31:   New Price: $13677.83
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Price Change: $12597.84 (1166.48%)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Confidence Score: 0.85
+[INFO] 2025/04/17 15:59:57 logging.go:31: ----------------------------------------
+[INFO] 2025/04/17 15:59:57 logging.go:31: Product: Bravia XR OLED (ID: 3)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Current Price: $2399.99
+[INFO] 2025/04/17 15:59:57 logging.go:31:   New Price: $10331.00
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Price Change: $7931.01 (330.46%)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Confidence Score: 0.85
+[INFO] 2025/04/17 15:59:57 logging.go:31: ----------------------------------------
+[INFO] 2025/04/17 15:59:57 logging.go:31: Product: MacBook Air (ID: 4)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Current Price: $1149.99
+[INFO] 2025/04/17 15:59:57 logging.go:31:   New Price: $10338.00
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Price Change: $9188.01 (798.96%)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Confidence Score: 0.85
+[INFO] 2025/04/17 15:59:57 logging.go:31: ----------------------------------------
+[INFO] 2025/04/17 15:59:57 logging.go:31: Product: WH-1000XM5 (ID: 5)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Current Price: $329.99
+[INFO] 2025/04/17 15:59:57 logging.go:31:   New Price: $10366.03
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Price Change: $10036.04 (3041.32%)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Confidence Score: 0.85
+[INFO] 2025/04/17 15:59:57 logging.go:31: ----------------------------------------
+[INFO] 2025/04/17 15:59:57 logging.go:31: Product: Galaxy Watch 6 (ID: 6)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Current Price: $309.99
+[INFO] 2025/04/17 15:59:57 logging.go:31:   New Price: $330.00
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Price Change: $20.01 (6.46%)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Confidence Score: 0.85
+[INFO] 2025/04/17 15:59:57 logging.go:31: ----------------------------------------
+[INFO] 2025/04/17 15:59:57 logging.go:31: Product: OLED evo C3 (ID: 7)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Current Price: $2099.99
+[INFO] 2025/04/17 15:59:57 logging.go:31:   New Price: $325.00
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Price Change: $-1774.99 (-84.52%)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Confidence Score: 0.85
+[INFO] 2025/04/17 15:59:57 logging.go:31: ----------------------------------------
+[INFO] 2025/04/17 15:59:57 logging.go:31: Product: Mi Notebook Pro (ID: 8)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Current Price: $749.99
+[INFO] 2025/04/17 15:59:57 logging.go:31:   New Price: $317.00
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Price Change: $-432.99 (-57.73%)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Confidence Score: 0.85
+[INFO] 2025/04/17 15:59:57 logging.go:31: ----------------------------------------
+[INFO] 2025/04/17 15:59:57 logging.go:31: Product: Redmi Note 12 (ID: 9)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Current Price: $229.99
+[INFO] 2025/04/17 15:59:57 logging.go:31:   New Price: $312.00
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Price Change: $82.01 (35.66%)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Confidence Score: 0.85
+[INFO] 2025/04/17 15:59:57 logging.go:31: ----------------------------------------
+[INFO] 2025/04/17 15:59:57 logging.go:31: Product: AirPods Max (ID: 10)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Current Price: $529.99
+[INFO] 2025/04/17 15:59:57 logging.go:31:   New Price: $319.00
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Price Change: $-210.99 (-39.81%)
+[INFO] 2025/04/17 15:59:57 logging.go:31:   Confidence Score: 0.85
+[INFO] 2025/04/17 15:59:57 logging.go:31: ----------------------------------------
+[INFO] 2025/04/17 15:59:57 logging.go:31: Test completed successfully
