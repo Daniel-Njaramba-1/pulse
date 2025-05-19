@@ -8,8 +8,6 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/lib/pq v1.10.9
-	github.com/robfig/cron/v3 v3.0.0
-	github.com/sajari/regression v1.0.1
 	golang.org/x/crypto v0.31.0
 )
 
@@ -23,5 +21,4 @@ require (
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
-	gonum.org/v1/gonum v0.15.1 // indirect
 )

@@ -21,7 +21,6 @@ func NewOrderService(db *sqlx.DB) *OrderService {
 }
 
 func (s *OrderService) GenerateOrder(ctx context.Context, userId int) error {
-	logging.LogInfo("Order generation started")
 	tx, err := s.db.BeginTxx(ctx, nil)
 	if err != nil {
 		logging.LogError(fmt.Sprintf("Failed to begin transaction: %v", err))
@@ -42,7 +41,6 @@ func (s *OrderService) GenerateOrder(ctx context.Context, userId int) error {
 		logging.LogError(fmt.Sprintf("Failed to get cart for user %d: %v", userId, err))
 		return err
 	}
-	logging.LogInfo(fmt.Sprintf("Cart ID %d found for user %d", cartId, userId))
 
 	// check for pending order, if pending, return error, if not create order
 	var existingOrderId int
@@ -61,8 +59,6 @@ func (s *OrderService) GenerateOrder(ctx context.Context, userId int) error {
 		logging.LogError(fmt.Sprintf("Error checking for existing order for user %d: %v", userId, err))
 		return fmt.Errorf("error checking for an existing order: %w", err)
 	}
-	logging.LogInfo(fmt.Sprintf("No pending order found for user %d", userId))
-
 	// at this point we know there are no pending orders
 
 	var cartItems []repo.CartItem
@@ -110,7 +106,6 @@ func (s *OrderService) GenerateOrder(ctx context.Context, userId int) error {
 			Price: currentPrice,
 			Quantity: item.Quantity,
 		})
-		logging.LogInfo(fmt.Sprintf("Added product %d (qty %d, price %.2f) to order", item.ProductId, item.Quantity, currentPrice))
 	}
 
 	// Create the order with expiration time for price validity
@@ -141,7 +136,6 @@ func (s *OrderService) GenerateOrder(ctx context.Context, userId int) error {
 		logging.LogError(fmt.Sprintf("Failed to create order for user %d: %v", userId, err))
 		return fmt.Errorf("failed to create order: %w", err)
 	}
-	logging.LogInfo(fmt.Sprintf("Order %d created for user %d", order.Id, userId))
 	
 	// Insert order items
 	insertOrderItemQuery := `
@@ -163,7 +157,6 @@ func (s *OrderService) GenerateOrder(ctx context.Context, userId int) error {
 			logging.LogError(fmt.Sprintf("Failed to create order item for order %d, product %d: %v", order.Id, item.ProductId, err))
 			return fmt.Errorf("failed to create order item: %w", err)
 		}
-		logging.LogInfo(fmt.Sprintf("Order item for product %d added to order %d", item.ProductId, order.Id))
 	}
 	
 	// Mark cart items as processed
@@ -177,14 +170,12 @@ func (s *OrderService) GenerateOrder(ctx context.Context, userId int) error {
 		logging.LogError(fmt.Sprintf("Failed to update cart items for cart %d: %v", cartId, err))
 		return fmt.Errorf("failed to update cart items: %w", err)
 	}
-	logging.LogInfo(fmt.Sprintf("Cart items for cart %d marked as processed", cartId))
 	
 	// Commit the transaction
 	if err = tx.Commit(); err != nil {
 		logging.LogError(fmt.Sprintf("Failed to commit transaction for order %d: %v", order.Id, err))
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
-	logging.LogInfo(fmt.Sprintf("Order generation completed successfully for user %d", userId))
 	
 	return nil
 }

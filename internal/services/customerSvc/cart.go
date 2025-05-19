@@ -170,7 +170,6 @@ func (s *CartService) AddItemToCart(ctx context.Context, userId int, productId i
 			logging.LogError("CartService - Add to Cart - Error updating existing cart item: %v", err)
 			return err
 		}
-		logging.LogInfo("CartService - Updated existing cart item ID: %d, new quantity: %d", existingItem.ID, existingItem.Quantity + quantity)
 	} else if err == sql.ErrNoRows {
 		// Item doesn't exist, insert new one
 		insertQuery := `
@@ -182,7 +181,6 @@ func (s *CartService) AddItemToCart(ctx context.Context, userId int, productId i
 			logging.LogError("CartService - Add to Cart - Error inserting new cart item: %v", err)
 			return err
 		}
-		logging.LogInfo("CartService - Added new item to cart ID: %d, product ID: %d, quantity: %d", cartId, productId, quantity)
 	} else {
 		// Some other database error
 		logging.LogError("CartService - Add to Cart - Database error checking for existing item: %v", err)

@@ -1,16 +1,18 @@
 package db
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"sync"
 	"time"
 
 	"github.com/Daniel-Njaramba-1/pulse/internal/config"
-	"github.com/Daniel-Njaramba-1/pulse/internal/pricing"
+	"github.com/Daniel-Njaramba-1/pulse/internal/util/logging"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
@@ -96,7 +98,7 @@ func (m *ClientManager) Run() {
 }
 
 func (m *ClientManager) RegisterChannel(ch chan string) {
-    m.register <- ch
+	m.register <- ch
 }
 
 func (m *ClientManager) UnregisterChannel(ch chan string) {
@@ -111,11 +113,11 @@ func InitDB(ctx context.Context, cfg *DBConfig) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to PostgreSQL: %w", err)
 	}
-	
+
 	if err := db.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("failed to ping PostgreSQL: %w", err)
 	}
-	
+
 	log.Println("Connected to Postgres")
 	return db, nil
 }
@@ -126,17 +128,17 @@ func ConnDB(ctx context.Context) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("load config failed: %w", err)
 	}
-	
+
 	db, err := InitDB(ctx, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("connection to Postgres failed: %w", err)
 	}
-	
+
 	return db, nil
 }
 
 // StartSaleListener adjusts price after a sale notification
-func StartSaleListener(connStr string, modelService *pricing.ModelService) { // Accept ModelService
+func StartSaleListener(connStr string) {
 	listener := pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {
 			log.Printf("Error in sales listener event: %v", err)
@@ -158,6 +160,7 @@ func StartSaleListener(connStr string, modelService *pricing.ModelService) { // 
 			if n == nil {
 				continue
 			}
+			logging.LogInfo("Received sale notification: %v", n.Extra)
 			log.Printf("Received sale notification: %v", n.Extra)
 
 			var sale struct {
@@ -174,14 +177,33 @@ func StartSaleListener(connStr string, modelService *pricing.ModelService) { // 
 				continue
 			}
 
-			// Adjust price for the product using the ModelService
-			ctx := context.Background()
-			newPrice, confidence, err := modelService.AdjustPrice(ctx, sale.ProductID) // Use modelService
+			// Call compute features API
+			apiURL := "http://localhost:5872/compute_features"
+			payload := map[string]int{
+				"product_id": sale.ProductID,
+			}
+			jsonData, err := json.Marshal(payload)
 			if err != nil {
-				log.Printf("Error adjusting price for product %d: %v", sale.ProductID, err)
+				logging.LogError("Error marshaling request data: %v", err)
+				log.Printf("Error marshaling request data: %v", err)
 				continue
 			}
-			log.Printf("Adjusted price for product %d to %.2f with confidence %.2f", sale.ProductID, newPrice, confidence)
+
+			resp, err := http.Post(apiURL, "application/json", bytes.NewBuffer(jsonData))
+			if err != nil {
+				logging.LogError("Error calling compute features API: %v", err)
+				log.Printf("Error calling compute features API: %v", err)
+				continue
+			}
+
+			if resp.StatusCode != http.StatusOK {
+				logging.LogError("Error response from compute features API: %v", resp.Status)
+				log.Printf("Error response from compute features API: %v", resp.Status)
+				continue
+			}
+
+			log.Printf("Successfully triggered feature computation for product %d", sale.ProductID)
+			logging.LogInfo("Successfully triggered feature computation for product %d", sale.ProductID)
 
 		case <-time.After(90 * time.Second):
 			// Ping the listener to keep the connection alive
@@ -225,32 +247,32 @@ func StartPriceAdjustmentListener(connStr string) {
 			if n == nil {
 				continue
 			}
-			
+
 			// Process the notification data
 			log.Printf("Received price adjustment notification: %v", n.Extra)
-			
+
 			// Parse the original notification
 			var adjustment struct {
-				ID          int     `json:"id"`
-				ProductID   int     `json:"product_id"`
-				OldPrice    float64 `json:"old_price"`
-				NewPrice    float64 `json:"new_price"`
-				CreatedAt   string  `json:"created_at"`
+				ID        int     `json:"id"`
+				ProductID int     `json:"product_id"`
+				OldPrice  float64 `json:"old_price"`
+				NewPrice  float64 `json:"new_price"`
+				CreatedAt string  `json:"created_at"`
 			}
-			
+
 			if err := json.Unmarshal([]byte(n.Extra), &adjustment); err != nil {
 				log.Printf("Error parsing price adjustment notification: %v", err)
 				continue
 			}
-			
+
 			// Create optimized payload
 			optimizedData := struct {
-				ProductID    int     `json:"product_id"`
-				NewPrice     float64 `json:"new_price"`
-				ChangedAt    string  `json:"changed_at"`
-				PriceChange  float64 `json:"price_change"`
-				ChangeType   string  `json:"change_type"`
-				ProductName  string  `json:"product_name"`
+				ProductID   int     `json:"product_id"`
+				NewPrice    float64 `json:"new_price"`
+				ChangedAt   string  `json:"changed_at"`
+				PriceChange float64 `json:"price_change"`
+				ChangeType  string  `json:"change_type"`
+				ProductName string  `json:"product_name"`
 			}{
 				ProductID:   adjustment.ProductID,
 				NewPrice:    adjustment.NewPrice,
@@ -258,24 +280,24 @@ func StartPriceAdjustmentListener(connStr string) {
 				PriceChange: adjustment.NewPrice - adjustment.OldPrice,
 				ChangeType:  getChangeType(adjustment.NewPrice, adjustment.OldPrice),
 			}
-			
+
 			// Get product name
 			err := db.QueryRow("SELECT name FROM products WHERE id = $1", adjustment.ProductID).Scan(&optimizedData.ProductName)
 			if err != nil {
 				log.Printf("Error fetching product name: %v", err)
 				optimizedData.ProductName = fmt.Sprintf("Product #%d", adjustment.ProductID)
 			}
-			
+
 			// Convert optimized data to JSON
 			optimizedJSON, err := json.Marshal(optimizedData)
 			if err != nil {
 				log.Printf("Error creating optimized payload: %v", err)
 				continue
 			}
-			
+
 			// Broadcast the optimized data
 			Manager.broadcast <- string(optimizedJSON)
-			
+
 		case <-time.After(90 * time.Second):
 			go func() {
 				if err := listener.Ping(); err != nil {

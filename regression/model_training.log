@@ -1,0 +1,264 @@
+2025-05-18 18:33:46,977 INFO Starting model training
+2025-05-18 18:33:46,983 INFO Fetched training data from DB:
+    id  product_id  days_since_last_sale  sales_velocity  total_sales_count  total_sales_value  category_percentile  review_score  wishlist_to_sales_ratio  days_since_restock last_model_run                 created_at                 updated_at  adjusted_price  base_price
+0    1          76                     0            0.17                  5               6000                 1.00           0.0                      0.0                   0           None 2025-05-18 04:28:11.238327 2025-05-18 04:28:11.238327         1199.99     1199.99
+1    3          77                     0            0.03                  1               3600                 0.25           0.0                      0.0                   0           None 2025-05-18 18:31:19.818511 2025-05-18 18:31:19.818511         1199.99     1999.99
+2    4          78                     0            0.03                  1               3600                 0.00           0.0                      0.0                   0           None 2025-05-18 18:31:19.834955 2025-05-18 18:31:19.834955          899.99      899.99
+3    5          79                     0            0.03                  1               9800                 1.00           0.0                      0.0                   0           None 2025-05-18 18:31:19.844237 2025-05-18 18:31:19.844237         1399.99     1399.99
+4    6          80                     0            0.03                  1               4250                 0.50           0.0                      0.0                   0           None 2025-05-18 18:31:19.853693 2025-05-18 18:31:19.853693          849.99      849.99
+5    7          81                     0            0.03                  1               1100                 0.50           0.0                      0.0                   0           None 2025-05-18 18:31:19.862745 2025-05-18 18:31:19.862745         1099.99     1099.99
+6    8          82                     0            0.03                  1               2580                 0.75           0.0                      0.0                   0           None 2025-05-18 18:31:19.871370 2025-05-18 18:31:19.871370          429.99      429.99
+7    9          84                     0            0.03                  1                450                 0.25           0.0                      0.0                   0           None 2025-05-18 18:31:19.880892 2025-05-18 18:31:19.880892          449.99      449.99
+8   10          85                     0            0.03                  1               3500                 1.00           0.0                      0.0                   0           None 2025-05-18 18:31:19.889834 2025-05-18 18:31:19.889834          699.99      699.99
+9   11          86                     0            0.03                  1               6800                 1.00           0.0                      0.0                   0           None 2025-05-18 18:31:19.899198 2025-05-18 18:31:19.899198          399.99      399.99
+10  12          88                     0            0.03                  1               2640                 0.50           0.0                      0.0                   0           None 2025-05-18 18:31:19.908200 2025-05-18 18:31:19.908200          329.99      329.99
+11  13          90                     0            0.03                  1               4550                 0.75           0.0                      0.0                   0           None 2025-05-18 18:31:19.917294 2025-05-18 18:31:19.917294          349.99      349.99
+2025-05-18 18:33:46,986 INFO Input features (X):
+    days_since_last_sale  sales_velocity  total_sales_count  total_sales_value  category_percentile  review_score  wishlist_to_sales_ratio  days_since_restock
+0                      0            0.17                  5               6000                 1.00           0.0                      0.0                   0
+1                      0            0.03                  1               3600                 0.25           0.0                      0.0                   0
+2                      0            0.03                  1               3600                 0.00           0.0                      0.0                   0
+3                      0            0.03                  1               9800                 1.00           0.0                      0.0                   0
+4                      0            0.03                  1               4250                 0.50           0.0                      0.0                   0
+5                      0            0.03                  1               1100                 0.50           0.0                      0.0                   0
+6                      0            0.03                  1               2580                 0.75           0.0                      0.0                   0
+7                      0            0.03                  1                450                 0.25           0.0                      0.0                   0
+8                      0            0.03                  1               3500                 1.00           0.0                      0.0                   0
+9                      0            0.03                  1               6800                 1.00           0.0                      0.0                   0
+10                     0            0.03                  1               2640                 0.50           0.0                      0.0                   0
+11                     0            0.03                  1               4550                 0.75           0.0                      0.0                   0
+2025-05-18 18:33:46,986 INFO Target variable (y):
+0     1.000000
+1     0.599998
+2     1.000000
+3     1.000000
+4     1.000000
+5     1.000000
+6     1.000000
+7     1.000000
+8     1.000000
+9     1.000000
+10    1.000000
+11    1.000000
+2025-05-18 18:33:47,016 INFO Model predictions (y_pred):
+0     1.000000
+1     0.910392
+2     0.868979
+3     0.967287
+4     0.944745
+5     0.978961
+6     1.004299
+7     0.944608
+8     1.035719
+9     0.999874
+10    0.962233
+11    0.982900
+2025-05-18 18:33:47,020 INFO Trained model coefficients:
+ModelCoefficients(model_version='v20250518_183347', training_date=datetime.datetime(2025, 5, 18, 18, 33, 47, 20231), sample_size=12, r_squared=0.15347453754459595, mse=0.010346525783898558, rmse=0.10171787347314412, mae=0.05840197716042422, days_since_last_sale_coef=0.0, sales_velocity_coef=-7.484005027117341e-05, total_sales_count_coef=-0.0021382871506644315, total_sales_value_coef=-1.0862146594843657e-05, category_percentile_coef=0.1656540753456423, review_score_coef=0.0, wishlist_to_sales_ratio_coef=0.0, days_since_restock_coef=0.0)
+2025-05-18 18:33:47,024 INFO Saved model coefficients to DB:
+ModelCoefficients(model_version='v20250518_183347', training_date=datetime.datetime(2025, 5, 18, 18, 33, 47, 20231), sample_size=12, r_squared=0.15347453754459595, mse=0.010346525783898558, rmse=0.10171787347314412, mae=0.05840197716042422, days_since_last_sale_coef=0.0, sales_velocity_coef=-7.484005027117341e-05, total_sales_count_coef=-0.0021382871506644315, total_sales_value_coef=-1.0862146594843657e-05, category_percentile_coef=0.1656540753456423, review_score_coef=0.0, wishlist_to_sales_ratio_coef=0.0, days_since_restock_coef=0.0)
+2025-05-18 18:33:47,024 INFO 127.0.0.1 - - [18/May/2025 18:33:47] "POST /train_model HTTP/1.1" 200 -
+2025-05-18 18:56:18,049 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 18:56:18,714 INFO  * Restarting with stat
+2025-05-18 18:56:20,961 WARNING  * Debugger is active!
+2025-05-18 18:56:20,967 INFO  * Debugger PIN: 107-261-707
+2025-05-18 18:56:59,097 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 18:56:59,354 INFO  * Restarting with stat
+2025-05-18 18:57:00,989 WARNING  * Debugger is active!
+2025-05-18 18:57:00,994 INFO  * Debugger PIN: 107-261-707
+2025-05-18 18:57:10,029 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 18:57:10,269 INFO  * Restarting with stat
+2025-05-18 19:10:56,645 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5872
+2025-05-18 19:10:56,646 INFO [33mPress CTRL+C to quit[0m
+2025-05-18 19:10:56,647 INFO  * Restarting with stat
+2025-05-18 19:10:58,237 WARNING  * Debugger is active!
+2025-05-18 19:10:58,249 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:11:43,770 INFO Starting adjusting all prices
+2025-05-18 19:11:43,918 INFO Fetched model coefficients from DB:
+   id     model_version              training_date  sample_size  r_squared       mse      rmse       mae  days_since_last_sale_coef  sales_velocity_coef  total_sales_count_coef  total_sales_value_coef  category_percentile_coef  review_score_coef  wishlist_to_sales_ratio_coef  days_since_restock_coef                 created_at                 updated_at
+0   4  v20250518_183347 2025-05-18 18:33:47.020231           12   0.153475  0.010347  0.101718  0.058402                        0.0            -0.000075               -0.002138               -0.000011                  0.165654                0.0                           0.0                      0.0 2025-05-18 18:33:47.021769 2025-05-18 18:33:47.021769
+2025-05-18 19:11:43,940 ERROR Error adjusting all prices: (psycopg2.errors.CheckViolation) new row for relation "product_metrics" violates check constraint "product_metrics_adjusted_price_check"
+DETAIL:  Failing row contains (77, 77, 0.0, 0, 0, 1999.99, -0.65, 2025-05-18 18:31:19.645779, null, 2025-05-18 03:45:26.718672, 2025-05-18 03:45:26.718672).
+
+[SQL: 
+    UPDATE product_metrics 
+    SET adjusted_price = %(adjusted_price)s
+    WHERE product_id = %(product_id)s
+    ]
+[parameters: {'adjusted_price': -0.6534967325000013, 'product_id': 77}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.CheckViolation: new row for relation "product_metrics" violates check constraint "product_metrics_adjusted_price_check"
+DETAIL:  Failing row contains (77, 77, 0.0, 0, 0, 1999.99, -0.65, 2025-05-18 18:31:19.645779, null, 2025-05-18 03:45:26.718672, 2025-05-18 03:45:26.718672).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\ADMIN\Desktop\pulse\regression\main.py", line 70, in adjust_all_prices
+    result = adjust_price_for_all_products()
+  File "C:\Users\ADMIN\Desktop\pulse\regression\learning.py", line 293, in adjust_price_for_all_products
+    conn.execute(text(update_query), {
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+        'adjusted_price': row['adjusted_price'],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'product_id': row['product_id']
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    })
+    ^^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1415, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1637, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1842, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1982, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 2351, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.CheckViolation) new row for relation "product_metrics" violates check constraint "product_metrics_adjusted_price_check"
+DETAIL:  Failing row contains (77, 77, 0.0, 0, 0, 1999.99, -0.65, 2025-05-18 18:31:19.645779, null, 2025-05-18 03:45:26.718672, 2025-05-18 03:45:26.718672).
+
+[SQL: 
+    UPDATE product_metrics 
+    SET adjusted_price = %(adjusted_price)s
+    WHERE product_id = %(product_id)s
+    ]
+[parameters: {'adjusted_price': -0.6534967325000013, 'product_id': 77}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-05-18 19:11:43,965 INFO 127.0.0.1 - - [18/May/2025 19:11:43] "[35m[1mPOST /adjust-prices HTTP/1.1[0m" 500 -
+2025-05-18 19:15:04,003 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:15:04,666 INFO  * Restarting with stat
+2025-05-18 19:15:08,268 WARNING  * Debugger is active!
+2025-05-18 19:15:08,272 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:15:12,301 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:15:12,525 INFO  * Restarting with stat
+2025-05-18 19:15:14,008 WARNING  * Debugger is active!
+2025-05-18 19:15:14,012 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:15:16,027 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:15:16,260 INFO  * Restarting with stat
+2025-05-18 19:15:17,991 WARNING  * Debugger is active!
+2025-05-18 19:15:17,995 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:20:33,085 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:20:33,997 INFO  * Restarting with stat
+2025-05-18 19:20:36,699 WARNING  * Debugger is active!
+2025-05-18 19:20:36,705 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:22:02,976 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:22:03,236 INFO  * Restarting with stat
+2025-05-18 19:22:04,898 WARNING  * Debugger is active!
+2025-05-18 19:22:04,902 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:22:11,932 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:22:12,174 INFO  * Restarting with stat
+2025-05-18 19:22:13,649 WARNING  * Debugger is active!
+2025-05-18 19:22:13,653 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:22:16,673 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:22:16,890 INFO  * Restarting with stat
+2025-05-18 19:22:18,445 WARNING  * Debugger is active!
+2025-05-18 19:22:18,449 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:22:21,466 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:22:21,689 INFO  * Restarting with stat
+2025-05-18 19:22:23,227 WARNING  * Debugger is active!
+2025-05-18 19:22:23,231 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:22:38,069 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5872
+2025-05-18 19:22:38,070 INFO [33mPress CTRL+C to quit[0m
+2025-05-18 19:22:38,071 INFO  * Restarting with stat
+2025-05-18 19:22:39,694 WARNING  * Debugger is active!
+2025-05-18 19:22:39,698 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:22:43,810 INFO Starting adjusting all prices
+2025-05-18 19:22:43,972 INFO Fetched model coefficients from DB:
+   id     model_version              training_date  sample_size  r_squared       mse      rmse       mae  days_since_last_sale_coef  sales_velocity_coef  total_sales_count_coef  total_sales_value_coef  category_percentile_coef  review_score_coef  wishlist_to_sales_ratio_coef  days_since_restock_coef                 created_at                 updated_at
+0   4  v20250518_183347 2025-05-18 18:33:47.020231           12   0.153475  0.010347  0.101718  0.058402                        0.0            -0.000075               -0.002138               -0.000011                  0.165654                0.0                           0.0                      0.0 2025-05-18 18:33:47.021769 2025-05-18 18:33:47.021769
+2025-05-18 19:22:43,991 INFO 12 products had price adjustments bounded (100.0%)
+2025-05-18 19:22:44,005 INFO Adjusted prices for 12 products
+2025-05-18 19:22:44,013 ERROR Error adjusting all prices: Object of type DataFrame is not JSON serializable
+Traceback (most recent call last):
+  File "C:\Users\ADMIN\Desktop\pulse\regression\main.py", line 71, in adjust_all_prices
+    return jsonify({"result": result}), 200
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\json\__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\json\provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+       ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\json\provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ~~~~~~^^^^^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\json\encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\json\encoder.py", line 261, in iterencode
+    return _iterencode(o, 0)
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\json\provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type DataFrame is not JSON serializable
+2025-05-18 19:22:44,092 INFO 127.0.0.1 - - [18/May/2025 19:22:44] "[35m[1mPOST /adjust-prices HTTP/1.1[0m" 500 -
+2025-05-18 19:23:33,869 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:23:34,191 INFO  * Restarting with stat
+2025-05-18 19:23:36,245 WARNING  * Debugger is active!
+2025-05-18 19:23:36,249 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:24:04,341 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:24:04,544 INFO  * Restarting with stat
+2025-05-18 19:24:06,181 WARNING  * Debugger is active!
+2025-05-18 19:24:06,185 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:24:12,211 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:24:12,508 INFO  * Restarting with stat
+2025-05-18 19:24:14,087 WARNING  * Debugger is active!
+2025-05-18 19:24:14,091 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:24:27,138 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:24:27,384 INFO  * Restarting with stat
+2025-05-18 19:24:28,840 WARNING  * Debugger is active!
+2025-05-18 19:24:28,844 INFO  * Debugger PIN: 107-261-707
+2025-05-18 19:24:37,877 INFO  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\pulse\\regression\\learning.py', reloading
+2025-05-18 19:24:38,092 INFO  * Restarting with stat
+2025-05-18 19:24:39,556 WARNING  * Debugger is active!
+2025-05-18 19:24:39,560 INFO  * Debugger PIN: 107-261-707

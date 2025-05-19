@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/Daniel-Njaramba-1/pulse/internal/db"
-	"github.com/Daniel-Njaramba-1/pulse/internal/pricing"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -21,7 +20,6 @@ import (
 type App struct {
 	db            *sqlx.DB
 	echo          *echo.Echo
-	pricingModel  *pricing.ModelService
 	dbConfig      *db.DBConfig
 }
 
@@ -59,12 +57,6 @@ func NewApp() (*App, error) {
 
 	// Set up SSE endpoint
 	e.GET("/api/price-adjustments", HandleSSE)
-	
-	// Initialize pricing model
-	pricingModel := pricing.NewModelService(database)
-	if err := InitializePricingModel(ctx, pricingModel); err != nil {
-		log.Printf("Error initializing pricing model: %v", err)
-	}
 
 	// Set up service handlers
 	adminServices := NewAdminServices(database)
@@ -91,15 +83,11 @@ func NewApp() (*App, error) {
     }
 	
 	// Start Price Adjustment
-	go db.StartSaleListener(connStr, pricingModel)
-	// Start schedulers
-	go StartPriceAdjustmentScheduler(pricingModel)
-	go StartModelTrainingScheduler(pricingModel)
+	go db.StartSaleListener(connStr)
 	
 	return &App{
 		db:           database,
 		echo:         e,
-		pricingModel: pricingModel,
 		dbConfig:     dbConfig,
 	}, nil
 }

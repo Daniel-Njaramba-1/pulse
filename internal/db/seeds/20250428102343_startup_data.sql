@@ -64,34 +64,53 @@ INSERT INTO product_metrics (product_id, base_price, adjusted_price) VALUES
 ((SELECT id FROM products WHERE name = 'Pixel Watch 2'), 349.99, 349.99);
 
 -- Seed data for stocks table
-INSERT INTO stocks (product_id, quantity, first_stocked_date) VALUES
+INSERT INTO stocks (product_id, quantity) VALUES
 -- Laptops
-((SELECT id FROM products WHERE name = 'MacBook Air'), 30, NOW()),
-((SELECT id FROM products WHERE name = 'MacBook Pro'), 25, NOW()),
-((SELECT id FROM products WHERE name = 'Galaxy Book2'), 20, NOW()),
-((SELECT id FROM products WHERE name = 'Galaxy Book3 Pro'), 15, NOW()),
-((SELECT id FROM products WHERE name = 'Pixelbook Go'), 22, NOW());
+((SELECT id FROM products WHERE name = 'MacBook Air'), 30),
+((SELECT id FROM products WHERE name = 'MacBook Pro'), 25),
+((SELECT id FROM products WHERE name = 'Galaxy Book2'), 20),
+((SELECT id FROM products WHERE name = 'Galaxy Book3 Pro'), 15),
+((SELECT id FROM products WHERE name = 'Pixelbook Go'), 22);
 
 --Phones
-INSERT INTO stocks (product_id, quantity, first_stocked_date) VALUES
-((SELECT id FROM products WHERE name = 'iPhone 15'), 75, NOW()),
-((SELECT id FROM products WHERE name = 'iPhone SE'), 60, NOW()),
-((SELECT id FROM products WHERE name = 'Galaxy S23'), 50, NOW()),
-((SELECT id FROM products WHERE name = 'Galaxy A54'), 65, NOW()),
-((SELECT id FROM products WHERE name = 'Pixel 8'), 45, NOW());
+INSERT INTO stocks (product_id, quantity) VALUES
+((SELECT id FROM products WHERE name = 'iPhone 15'), 75),
+((SELECT id FROM products WHERE name = 'iPhone SE'), 60),
+((SELECT id FROM products WHERE name = 'Galaxy S23'), 50),
+((SELECT id FROM products WHERE name = 'Galaxy A54'), 65),
+((SELECT id FROM products WHERE name = 'Pixel 8'), 45);
 
 -- Watches
-INSERT INTO stocks (product_id, quantity, first_stocked_date) VALUES
-((SELECT id FROM products WHERE name = 'Apple Watch Series 9'), 40, NOW()),
-((SELECT id FROM products WHERE name = 'Apple Watch SE'), 45, NOW()),
-((SELECT id FROM products WHERE name = 'Galaxy Watch 6'), 35, NOW()),
-((SELECT id FROM products WHERE name = 'Galaxy Watch Active 2'), 30, NOW()),
-((SELECT id FROM products WHERE name = 'Pixel Watch 2'), 25, NOW());
+INSERT INTO stocks (product_id, quantity) VALUES
+((SELECT id FROM products WHERE name = 'Apple Watch Series 9'), 40),
+((SELECT id FROM products WHERE name = 'Apple Watch SE'), 45),
+((SELECT id FROM products WHERE name = 'Galaxy Watch 6'), 35),
+((SELECT id FROM products WHERE name = 'Galaxy Watch Active 2'), 30),
+((SELECT id FROM products WHERE name = 'Pixel Watch 2'), 25);
+
+
+-- Seed data for price_model_coefficients
+INSERT INTO price_model_coefficients (
+  model_version,
+  training_date,
+  sample_size,
+  days_since_last_sale_coef,
+  sales_velocity_coef,
+  total_sales_count_coef,
+  total_sales_value_coef,
+  category_percentile_coef,
+  review_score_coef,
+  wishlist_to_sales_ratio_coef,
+  days_since_restock_coef
+) VALUES
+('v1.0', NOW(), 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
+DELETE FROM price_model_coefficients WHERE model_version = 'v1.0';
+
 DELETE FROM stocks WHERE product_id IN (
   SELECT id FROM products WHERE name IN (
     'MacBook Air', 'MacBook Pro', 'Galaxy Book2', 'Galaxy Book3 Pro', 'Pixelbook Go',

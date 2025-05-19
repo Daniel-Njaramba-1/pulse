@@ -22,6 +22,8 @@ After training, new coefficients are calculated and saved
 
 golang trigger for adjustprice after sales outside transaction
 
+Adjusted Price = Base Price × (1 + Σ(coefficient_i × feature_i))
+
 
 
 

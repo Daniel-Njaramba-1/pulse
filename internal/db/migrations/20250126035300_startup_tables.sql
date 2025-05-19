@@ -66,12 +66,10 @@ CREATE TABLE IF NOT EXISTS pricing_features (
     sales_velocity DECIMAL(10, 2) DEFAULT 0,
     total_sales_count INTEGER DEFAULT 0,
     total_sales_value INTEGER DEFAULT 0,
-    category_rank INTEGER,
     category_percentile DECIMAL(10, 2), 
     review_score DECIMAL(10, 2) DEFAULT 0,
     wishlist_to_sales_ratio DECIMAL (10, 2) DEFAULT 0,
-    days_in_stock INTEGER DEFAULT 0,
-    seasonal_factor DECIMAL(10, 2) DEFAULT 1.0,
+    days_since_restock INTEGER DEFAULT 0,
     last_model_run TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -86,18 +84,18 @@ CREATE TABLE IF NOT EXISTS price_model_coefficients (
     training_date TIMESTAMP NOT NULL,
     sample_size INTEGER NOT NULL,
     r_squared DECIMAL(10, 8),
+    mse DECIMAL (15, 8), -- mean squared error
+    rmse DECIMAL (15, 8), -- root mean squared error
+    mae DECIMAL (15, 8), -- mean absolute error 
     -- Coefficients for each feature
-    intercept DECIMAL(12, 6) NOT NULL,
-    sales_count_coef DECIMAL(12, 6),
-    sales_value_coef DECIMAL(12, 6),
+    days_since_last_sale_coef DECIMAL(12, 6),
     sales_velocity_coef DECIMAL(12, 6),
-    days_since_sale_coef DECIMAL(12, 6),
-    category_rank_coef DECIMAL(12, 6),
+    total_sales_count_coef DECIMAL(12, 6),
+    total_sales_value_coef DECIMAL(12, 6),
     category_percentile_coef DECIMAL(12, 6),
     review_score_coef DECIMAL(12, 6),
-    wishlist_ratio_coef DECIMAL(12, 6),
-    days_in_stock_coef DECIMAL(12, 6),
-    seasonal_factor_coef DECIMAL(12, 6),
+    wishlist_to_sales_ratio_coef DECIMAL(12, 6),
+    days_since_restock_coef DECIMAL(12, 6),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
@@ -106,13 +104,14 @@ CREATE TABLE IF NOT EXISTS price_model_coefficients (
 CREATE TABLE IF NOT EXISTS price_adjustments (
     id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL,
+    pricing_features_id INTEGER NOT NULL,
     old_price DECIMAL(10, 2) NOT NULL CHECK (old_price >= 0), --  Adjusted price before adjustment
     new_price DECIMAL(10, 2) CHECK (new_price >= 0),  -- Adjusted price log change
     model_version VARCHAR(50) NOT NULL,
-    confidence_score DECIMAL(5,4) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (pricing_features_id) REFERENCES pricing_features(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS stocks (
@@ -120,8 +119,6 @@ CREATE TABLE IF NOT EXISTS stocks (
     product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 0 CHECK (quantity >= 0),
     stock_threshold INTEGER NOT NULL DEFAULT 0 CHECK (stock_threshold >= 0), -- Threshold for low stock alert
-    first_stocked_date TIMESTAMP,
-    last_out_of_stock_date TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
@@ -130,10 +127,9 @@ CREATE TABLE IF NOT EXISTS stocks (
 CREATE TABLE IF NOT EXISTS stock_history (
     id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL,
-    event_type VARCHAR(20) NOT NULL, -- "in stock", "out of stock", "restock"
+    event_type VARCHAR(20) NOT NULL, -- "in stock", "out of stock", "restock", "sale"
     quantity_change INTEGER NOT NULL,
     quantity_after INTEGER NOT NULL,
-    event_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE

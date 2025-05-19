@@ -48,6 +48,7 @@ const (
 	StockingEventInStock		StockingEvent = "in stock"
 	StockingEventOutOfStock 	StockingEvent = "out of stock"
 	StockingEventRestock 		StockingEvent = "restock"
+	StockingEventSale			StockingEvent = "sale"
 )
 
 type StockHistory struct {
