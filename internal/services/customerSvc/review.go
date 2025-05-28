@@ -16,6 +16,41 @@ func NewReviewService(db *sqlx.DB) *ReviewService {
 	return &ReviewService{db: db}
 }
 
+func (s *ReviewService) GetReviewforProduct(ctx context.Context, productId int) ([]*repo.ReviewDetail, error) {
+	query := `
+		SELECT r.id, r.customer_id, r.product_id, r.rating, r.review_text, r.created_at, c.username
+		FROM reviews r
+		INNER JOIN customers c ON r.customer_id = c.id
+		WHERE r.product_id = $1
+		ORDER BY r.id DESC
+	`
+	var reviews []*repo.ReviewDetail
+	err := s.db.SelectContext(ctx, &reviews, query, productId)
+	if err != nil {
+		return nil, err
+	}
+	return reviews, nil
+}
+
+func (s *ReviewService) VerifyPurchase(ctx context.Context, userId int, productId int) (bool, error) {
+	var count int
+	query := `
+		SELECT COUNT(*)
+		FROM sales
+		WHERE product_id = $1 AND order_item_id IN (
+			SELECT id FROM order_items WHERE order_id IN (
+				SELECT id FROM orders WHERE customer_id = $2 AND status = 'completed'
+			)
+		)
+	`
+	err := s.db.QueryRowContext(ctx, query, productId, userId).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+
 func (s *ReviewService) ReviewProduct(ctx context.Context, review *repo.Review) error {
 	tx, err := s.db.BeginTxx(ctx, nil)
 	if err != nil {

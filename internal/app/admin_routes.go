@@ -93,5 +93,34 @@ func AdminRoutes(e *echo.Echo, adminHandlers *AdminHdl) {
     protected.PUT("/products/:id/restock", func(c echo.Context) error {
         return adminHandlers.ProductHandler.UpdateProductStock(c)
     })
+
+    // Dashboard routes
+    protected.GET("/dashboard/analytics", func(c echo.Context) error {
+        return adminHandlers.DashboardHandler.GetAnalytics(c)
+    })
+    protected.GET("/dashboard/model-performance", func(c echo.Context) error {
+        return adminHandlers.DashboardHandler.GetModelPerformance(c)
+    })
+    protected.GET("/dashboard/sales", func(c echo.Context) error {
+        return adminHandlers.DashboardHandler.GetSalesAnalytics(c)
+    })
+    protected.GET("/dashboard/inventory", func(c echo.Context) error {
+        return adminHandlers.DashboardHandler.GetInventoryStatus(c)
+    })
+    protected.GET("/dashboard/pricing", func(c echo.Context) error {
+        return adminHandlers.DashboardHandler.GetPricingAnalytics(c)
+    })
+    protected.GET("/dashboard/customers", func(c echo.Context) error {
+        return adminHandlers.DashboardHandler.GetCustomerBehavior(c)
+    })
+    protected.GET("/dashboard/health", func(c echo.Context) error {
+        return adminHandlers.DashboardHandler.GetOperationalHealth(c)
+    })
+    protected.GET("/dashboard/top-products", func(c echo.Context) error {
+        return adminHandlers.DashboardHandler.GetTopProducts(c)
+    })
+    protected.GET("/dashboard/category-revenue", func(c echo.Context) error {
+        return adminHandlers.DashboardHandler.GetCategoryRevenue(c)
+    })
 }
 

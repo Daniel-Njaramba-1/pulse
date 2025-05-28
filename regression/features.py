@@ -3,8 +3,16 @@ from datetime import datetime
 from sqlalchemy import text
 
 from db import get_db_engine
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
 
 engine = get_db_engine()
+
+# Download VADER lexicon if not already present
+try:
+    nltk.data.find('sentiment/vader_lexicon.zip')
+except LookupError:
+    nltk.download('vader_lexicon')
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -99,18 +107,46 @@ def get_category_percentile(product_id: int) -> float:
         return percentile
 
 def get_review_score(product_id: int) -> float:
-    """Get average review score for a product."""
+    """Get average review score for a product, enhanced with sentiment analysis."""
+
     logger.info(f"Called get_review_score with product_id={product_id}")
-    query = """
+
+    # Get numeric average rating
+    average_rating_query = """
         SELECT average_rating
         FROM product_metrics
         WHERE product_id = :product_id
     """
+
+    # Get review texts
+    review_query = """
+        SELECT review_text
+        FROM reviews
+        WHERE product_id = :product_id
+        AND review_text IS NOT NULL
+        AND review_text != ''
+    """
+
     with engine.connect() as conn:
-        result = conn.execute(text(query), {"product_id": product_id}).fetchone()
-        score = float(result[0]) if result and result[0] is not None else 0.0
-        logger.info(f"get_review_score result: {score}")
-        return score
+        # Numeric average
+        result = conn.execute(text(average_rating_query), {"product_id": product_id}).fetchone()
+        numeric_score = float(result[0]) if result and result[0] is not None else 0.0
+
+        # Sentiment analysis
+        review_texts = [row[0] for row in conn.execute(text(review_query), {"product_id": product_id}).fetchall()]
+        if review_texts:
+            sia = SentimentIntensityAnalyzer()
+            sentiment_scores = [sia.polarity_scores(text)["compound"] for text in review_texts]
+            avg_sentiment = sum(sentiment_scores) / len(sentiment_scores)
+            # Normalize sentiment (-1 to 1) to (0 to 5) scale
+            sentiment_score = (avg_sentiment + 1) * 2.5
+            # Weighted average: 70% numeric, 30% sentiment
+            final_score = 0.7 * numeric_score + 0.3 * sentiment_score
+            logger.info(f"get_review_score result (with sentiment): {final_score}")
+            return final_score
+        else:
+            logger.info(f"get_review_score result (numeric only): {numeric_score}")
+            return numeric_score
 
 def get_wishlist_to_sales_ratio(product_id: int) -> float:
     """Calculate ratio of wishlist count to total sales."""
@@ -177,16 +213,28 @@ def process_features(product_id: int) -> str:
     features = compute_all_features(product_id)
     columns = ', '.join(features.keys())
     placeholders = ', '.join([f":{k}" for k in features.keys()])
-    query = f"""
+    update_assignments = ', '.join([f"{k} = :{k}" for k in features.keys() if k != 'product_id'])
+
+    select_query = "SELECT 1 FROM pricing_features WHERE product_id = :product_id"
+    insert_query = f"""
         INSERT INTO pricing_features ({columns})
         VALUES ({placeholders})
-        ON CONFLICT (product_id) DO UPDATE SET
-        {', '.join([f"{k} = EXCLUDED.{k}" for k in features.keys() if k != 'product_id'])}
     """
+    update_query = f"""
+        UPDATE pricing_features
+        SET {update_assignments}
+        WHERE product_id = :product_id
+    """
+
     try:
         with engine.begin() as conn:
-            conn.execute(text(query), features)
-        logger.info("process_features result: success")
+            exists = conn.execute(text(select_query), {"product_id": product_id}).fetchone()
+            if exists:
+                conn.execute(text(update_query), features)
+                logger.info("process_features: updated existing record")
+            else:
+                conn.execute(text(insert_query), features)
+                logger.info("process_features: inserted new record")
         return "success"
     except Exception as e:
         logger.error(f"process_features error: {e}")

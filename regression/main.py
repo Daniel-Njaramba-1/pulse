@@ -5,6 +5,8 @@ from flask_cors import CORS
 
 from features import process_features
 from learning import train_model, adjust_price_for_all_products, adjust_price_for_product
+from sqlalchemy import create_engine, text
+from learning import get_model_coefficients
 # Load environment variables
 load_dotenv()
 
@@ -28,7 +30,7 @@ def compute_features():
     result = process_features(product_id)
     return jsonify({"result": result})
 
-@app.route('/train_model', methods=['POST'])
+@app.route('/train-model', methods=['POST'])
 def train_pricing_model():
     """Train pricing model with available data"""
     try:
@@ -71,6 +73,37 @@ def adjust_all_prices():
         return jsonify({"result": result}), 200
     except Exception as e:
         logger.exception(f"Error adjusting all prices: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get-price-model-coefficients', methods=['GET'])
+def get_price_model_coefficients():
+    try:
+        engine = create_engine('sqlite:///pricing.db')
+        model_coeffs = get_model_coefficients()
+        if model_coeffs is None:
+            return jsonify({"error": "No model coefficients found"}), 404
+        results = {
+            "model_version": model_coeffs.model_version,
+            "training_date": str(model_coeffs.training_date),
+            "sample_size": model_coeffs.sample_size,
+            "r_squared": model_coeffs.r_squared,
+            "mse": model_coeffs.mse,
+            "rmse": model_coeffs.rmse,
+            "mae": model_coeffs.mae,
+            "days_since_last_sale_coef": model_coeffs.days_since_last_sale_coef,
+            "sales_velocity_coef": model_coeffs.sales_velocity_coef,
+            "total_sales_count_coef": model_coeffs.total_sales_count_coef,
+            "total_sales_value_coef": model_coeffs.total_sales_value_coef,
+            "category_percentile_coef": model_coeffs.category_percentile_coef,
+            "review_score_coef": model_coeffs.review_score_coef,
+            "wishlist_to_sales_ratio_coef": model_coeffs.wishlist_to_sales_ratio_coef,
+            "days_since_restock_coef": model_coeffs.days_since_restock_coef
+        }
+
+        results = get_price_model_coefficients()
+        return jsonify({"coefficients": results}), 200
+    except Exception as e:
+        logger.exception(f"Error fetching model coefficients: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 # Set up file handler for logging if not already present

@@ -182,13 +182,12 @@ def train_model():
     save_model_coefficients(new_coefficients)
     return new_coefficients
 
-def adjust_price_for_product(product_id, min_ratio=0.5, max_ratio=2.0):
+def adjust_price_for_product(product_id, min_ratio=0.8, max_ratio=1.2):
     """Adjust price for a single product using the latest model coefficients with bounds.
     
     Args:
         product_id: The ID of the product to adjust
-        min_ratio: Minimum allowed ratio of adjusted_price/base_price (default: 0.5 = 50%)
-        max_ratio: Maximum allowed ratio of adjusted_price/base_price (default: 2.0 = 200%)
+        min/max adjusted price = +-20% base price
     
     Returns:
         The adjusted price
@@ -202,7 +201,8 @@ def adjust_price_for_product(product_id, min_ratio=0.5, max_ratio=2.0):
     query = """
     SELECT 
         pf.*,
-        pm.base_price
+        pm.base_price,
+        pm.adjusted_price
     FROM pricing_features pf
     JOIN product_metrics pm ON pf.product_id = pm.product_id
     WHERE pf.product_id = :product_id
@@ -236,60 +236,69 @@ def adjust_price_for_product(product_id, min_ratio=0.5, max_ratio=2.0):
         coefficients.days_since_restock_coef * features[7]
     )
     
-    # Apply bounds to adjustment ratio
-    bounded_ratio = max(min(adjustment_ratio, max_ratio), min_ratio)
-    
-    if bounded_ratio != adjustment_ratio:
-        logging.info(f"Product {product_id}: Adjustment ratio {adjustment_ratio:.4f} was bounded to {bounded_ratio:.4f}")
-    
-    # Calculate adjusted price
+    # Bound the ratio to +-20% of base price
+    bounded_ratio = min(max(adjustment_ratio, min_ratio), max_ratio)
     base_price = df['base_price'].iloc[0]
+    old_adjusted_price = df['adjusted_price'].iloc[0] if not pd.isnull(df['adjusted_price'].iloc[0]) else None
     adjusted_price = base_price * bounded_ratio
-    
+
     # Update the adjusted price in the database
     update_query = """
     UPDATE product_metrics 
     SET adjusted_price = :adjusted_price
     WHERE product_id = :product_id
     """
+
+    # Log the price adjustment in a separate table
+    insert_log_query = """
+    INSERT INTO price_adjustments (product_id, old_price, new_price, model_version)
+    VALUES (:product_id, :old_price, :new_price, :model_version)
+    """
+
     with engine.connect() as conn:
         conn.execute(text(update_query), {
             'adjusted_price': adjusted_price,
             'product_id': product_id
         })
+        conn.execute(text(insert_log_query), {
+            'product_id': product_id,
+            'old_price': old_adjusted_price,
+            'new_price': adjusted_price,
+            'model_version': coefficients.model_version
+        })
         conn.commit()
     
-    logging.info(f"Adjusted price for product {product_id}: {adjusted_price} (ratio: {bounded_ratio:.4f})")
+    logging.info(f"Adjusted price for product {product_id}: {adjusted_price:.2f} (old: {old_adjusted_price}, ratio: {bounded_ratio:.4f})")
     return adjusted_price
 
-def adjust_price_for_all_products(min_ratio=0.5, max_ratio=2.0):
+def adjust_price_for_all_products(min_ratio=0.8, max_ratio=1.2):
     """Adjust price for all products using the latest model coefficients with bounds.
-    
+
     Args:
-        min_ratio: Minimum allowed ratio of adjusted_price/base_price (default: 0.5 = 50%)
-        max_ratio: Maximum allowed ratio of adjusted_price/base_price (default: 2.0 = 200%)
-    
+        min/max adjusted price = +-20% base price
+
     Returns:
-        DataFrame with product_id, adjusted_price, and whether bounds were applied
+        DataFrame with product_id, adjusted_price
     """
     # Get latest model coefficients
     coefficients = get_model_coefficients()
     if coefficients is None:
         raise ValueError("No model coefficients found in database")
-    
+
     # Get all products' features and base prices
     query = """
     SELECT 
         pf.*,
-        pm.base_price
+        pm.base_price,
+        pm.adjusted_price
     FROM pricing_features pf
     JOIN product_metrics pm ON pf.product_id = pm.product_id
     """
     df = pd.read_sql(query, engine)
-    
+
     if df.empty:
         raise ValueError("No product data found")
-    
+
     # Calculate adjustment ratios for all products
     adjustment_ratios = (
         coefficients.days_since_last_sale_coef * df['days_since_last_sale'] +
@@ -301,34 +310,46 @@ def adjust_price_for_all_products(min_ratio=0.5, max_ratio=2.0):
         coefficients.wishlist_to_sales_ratio_coef * df['wishlist_to_sales_ratio'] +
         coefficients.days_since_restock_coef * df['days_since_restock']
     )
-    
-    # Apply bounds to adjustment ratios
-    df['original_ratio'] = adjustment_ratios
-    df['bounded_ratio'] = adjustment_ratios.clip(lower=min_ratio, upper=max_ratio)
-    df['price_bounded'] = df['original_ratio'] != df['bounded_ratio']
-    
-    # Count and log bounded products
-    bounded_count = df['price_bounded'].sum()
-    if bounded_count > 0:
-        logging.info(f"{bounded_count} products had price adjustments bounded ({bounded_count/len(df)*100:.1f}%)")
-    
-    # Calculate adjusted prices
+
+    # Bound the ratio to +-20% of base price
+    bounded_ratios = adjustment_ratios.clip(lower=min_ratio, upper=max_ratio)
+    df['bounded_ratio'] = bounded_ratios
     df['adjusted_price'] = df['base_price'] * df['bounded_ratio']
-    
-    # Update adjusted prices in the database
+
+    # Track which products were bounded
+    df['price_bounded'] = (adjustment_ratios != bounded_ratios)
+
+    # Update adjusted prices and log adjustments in the database
     update_query = """
     UPDATE product_metrics 
     SET adjusted_price = :adjusted_price
     WHERE product_id = :product_id
     """
+
+    insert_log_query = """
+    INSERT INTO price_adjustments (product_id, old_price, new_price, model_version)
+    VALUES (:product_id, :old_price, :new_price, :model_version)
+    """
+
     with engine.connect() as conn:
         for _, row in df.iterrows():
+            old_adjusted_price = row['adjusted_price'] if not pd.isnull(row['adjusted_price']) else None
+            new_adjusted_price = row['adjusted_price']
             conn.execute(text(update_query), {
-                'adjusted_price': row['adjusted_price'],
+                'adjusted_price': new_adjusted_price,
                 'product_id': row['product_id']
             })
+            conn.execute(text(insert_log_query), {
+                'product_id': row['product_id'],
+                'old_price': old_adjusted_price,
+                'new_price': new_adjusted_price,
+                'model_version': coefficients.model_version
+            })
         conn.commit()
-    
-    logging.info(f"Adjusted prices for {len(df)} products")
 
-    return ("Prices adjusted correctly")
+    bounded_count = df['price_bounded'].sum()
+    if bounded_count > 0:
+        logging.info(f"{bounded_count} products had price adjustments bounded ({bounded_count/len(df)*100:.1f}%)")
+
+    logging.info(f"Adjusted prices for {len(df)} products")
+    return df[['product_id', 'adjusted_price']].to_dict(orient='records')

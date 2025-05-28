@@ -88,6 +88,31 @@ INSERT INTO stocks (product_id, quantity) VALUES
 ((SELECT id FROM products WHERE name = 'Galaxy Watch Active 2'), 30),
 ((SELECT id FROM products WHERE name = 'Pixel Watch 2'), 25);
 
+-- Seed data for stocking history
+INSERT INTO stock_history (product_id, event_type, quantity_change, quantity_after) VALUES 
+-- Laptops
+((SELECT id FROM products WHERE name = 'MacBook Air'), 'restock', 30, 30),
+((SELECT id FROM products WHERE name = 'MacBook Pro'), 'restock', 25, 25),
+((SELECT id FROM products WHERE name = 'Galaxy Book2'), 'restock', 20, 20),
+((SELECT id FROM products WHERE name = 'Galaxy Book3 Pro'),'restock', 15, 15),
+((SELECT id FROM products WHERE name = 'Pixelbook Go'), 'restock', 22, 22);
+
+--Phones
+INSERT INTO stock_history (product_id, event_type, quantity_change, quantity_after) VALUES
+((SELECT id FROM products WHERE name = 'iPhone 15'), 'restock', 75, 75),
+((SELECT id FROM products WHERE name = 'iPhone SE'), 'restock', 60, 60),
+((SELECT id FROM products WHERE name = 'Galaxy S23'), 'restock', 50, 50),
+((SELECT id FROM products WHERE name = 'Galaxy A54'), 'restock', 65, 65),
+((SELECT id FROM products WHERE name = 'Pixel 8'), 'restock', 45, 45);
+
+-- Watches
+INSERT INTO stock_history (product_id, event_type, quantity_change, quantity_after) VALUES
+((SELECT id FROM products WHERE name = 'Apple Watch Series 9'), 'restock', 40, 40),
+((SELECT id FROM products WHERE name = 'Apple Watch SE'), 'restock', 45, 45),
+((SELECT id FROM products WHERE name = 'Galaxy Watch 6'), 'restock', 35, 35),
+((SELECT id FROM products WHERE name = 'Galaxy Watch Active 2'), 'restock', 30, 30),
+((SELECT id FROM products WHERE name = 'Pixel Watch 2'), 'restock', 25, 25);
+
 
 -- Seed data for price_model_coefficients
 INSERT INTO price_model_coefficients (
@@ -110,6 +135,14 @@ INSERT INTO price_model_coefficients (
 -- +goose Down
 -- +goose StatementBegin
 DELETE FROM price_model_coefficients WHERE model_version = 'v1.0';
+
+DELETE FROM stock_history WHERE product_id IN (
+  SELECT id FROM products WHERE name IN (
+    'MacBook Air', 'MacBook Pro', 'Galaxy Book2', 'Galaxy Book3 Pro', 'Pixelbook Go',
+    'iPhone 15', 'iPhone SE', 'Galaxy S23', 'Galaxy A54', 'Pixel 8',
+    'Apple Watch Series 9', 'Apple Watch SE', 'Galaxy Watch 6', 'Galaxy Watch Active 2', 'Pixel Watch 2'
+  )
+);
 
 DELETE FROM stocks WHERE product_id IN (
   SELECT id FROM products WHERE name IN (

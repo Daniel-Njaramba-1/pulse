@@ -109,6 +109,7 @@
         
         try {
             const response = await checkoutHelpers.generateOrder();
+            goto('/checkout')
         } catch (err) {
             console.error("Error generating cart: ", err);
             toast.error("Failed generating cart")

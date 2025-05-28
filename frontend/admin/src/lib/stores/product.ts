@@ -63,7 +63,7 @@ export const error = writable<string | null>(null);
 const API_BASE_URL = "http://localhost:8080/api/admin";
 
 export const productHelpers = {
-    fetchProducts: async (): Promise<ProductResponse> => {
+    fetchProducts: async (): Promise<ProductDetailResponse> => {
         isLoading.set(true);
         error.set(null);
         
@@ -82,8 +82,20 @@ export const productHelpers = {
                 return { success:false, error:errorData.message};
             }
         
-            const data: Product[] = await response.json();
-            products.set(data);
+            const data: ProductDetail[] = await response.json();
+            // Map ProductDetail[] to Product[] by extracting or providing default values for missing fields
+            const mappedProducts: Product[] = data.map((detail) => ({
+                id: detail.id,
+                brand: detail.brand_name ?? "",
+                category: detail.category_name ?? "",
+                name: detail.name,
+                description: detail.description ?? "",
+                image: undefined as unknown as File, // Placeholder, since image File is not available from API
+                image_path: detail.image_path ?? "",
+                is_active: detail.is_active,
+                base_price: detail.base_price ?? 0
+            }));
+            products.set(mappedProducts);
             return {success:true, data};
         } catch (err) {
             console.error("Error fetching products", err)

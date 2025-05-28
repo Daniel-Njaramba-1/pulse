@@ -1,31 +1,52 @@
-
-[INFO] 2025/05/18 04:18:46 logging.go:31: CartService - Add to Cart - Cart not found, creating new cart
-[ERROR] 2025/05/18 04:18:46 logging.go:36: CartService - Add to Cart - Failed to create cart: pq: insert or update on table "carts" violates foreign key constraint "carts_customer_id_fkey"
-[INFO] 2025/05/18 04:18:46 logging.go:31: CartHandler - Add to Cart - Error Adding to Cart
-[INFO] 2025/05/18 04:19:42 logging.go:31: Transaction started
-[INFO] 2025/05/18 04:28:11 logging.go:31: Received sale notification: {"id":4,"order_item_id":4,"product_id":76,"sale_price":1199.99,"quantity":1,"created_at":"2025-05-18T04:28:11.087041","updated_at":"2025-05-18T04:28:11.087041"}
-[INFO] 2025/05/18 04:28:11 logging.go:31: Successfully triggered feature computation for product 76
-[INFO] 2025/05/18 04:32:03 logging.go:31: Received sale notification: {"id":5,"order_item_id":5,"product_id":76,"sale_price":1199.99,"quantity":1,"created_at":"2025-05-18T04:32:03.119269","updated_at":"2025-05-18T04:32:03.119269"}
-[INFO] 2025/05/18 04:32:03 logging.go:31: Successfully triggered feature computation for product 76
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":6,"order_item_id":6,"product_id":77,"sale_price":1199.99,"quantity":3,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 77
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":7,"order_item_id":7,"product_id":78,"sale_price":899.99,"quantity":4,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 78
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":8,"order_item_id":8,"product_id":79,"sale_price":1399.99,"quantity":7,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 79
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":9,"order_item_id":9,"product_id":80,"sale_price":849.99,"quantity":5,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 80
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":10,"order_item_id":10,"product_id":81,"sale_price":1099.99,"quantity":1,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 81
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":11,"order_item_id":11,"product_id":82,"sale_price":429.99,"quantity":6,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 82
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":12,"order_item_id":12,"product_id":84,"sale_price":449.99,"quantity":1,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 84
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":13,"order_item_id":13,"product_id":85,"sale_price":699.99,"quantity":5,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 85
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":14,"order_item_id":14,"product_id":86,"sale_price":399.99,"quantity":17,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 86
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":15,"order_item_id":15,"product_id":88,"sale_price":329.99,"quantity":8,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 88
-[INFO] 2025/05/18 18:31:19 logging.go:31: Received sale notification: {"id":16,"order_item_id":16,"product_id":90,"sale_price":349.99,"quantity":13,"created_at":"2025-05-18T18:31:19.645779","updated_at":"2025-05-18T18:31:19.645779"}
-[INFO] 2025/05/18 18:31:19 logging.go:31: Successfully triggered feature computation for product 90
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: init
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching model performance
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ViewModelPerformance called
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ViewModelPerformance success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching sales analytics
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseSales called with days=30
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseSales success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching inventory status
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ManageInventory called
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ManageInventory success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching pricing analytics
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseDynamicPricing called with days=30
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseDynamicPricing success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching customer behavior
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseCustomerBehavior called
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseCustomerBehavior success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching operational health
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ViewOperationalHealth called
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ViewOperationalHealth success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching top products
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: GetTopSellingProducts called with limit=10
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: GetTopSellingProducts success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching category revenue
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: GetRevenueByCategory called with days=30
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: GetRevenueByCategory success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: init
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching model performance
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ViewModelPerformance called
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ViewModelPerformance success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching sales analytics
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseSales called with days=30
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseSales success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching inventory status
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ManageInventory called
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ManageInventory success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching pricing analytics
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseDynamicPricing called with days=30
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseDynamicPricing success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching customer behavior
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseCustomerBehavior called
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: AnalyseCustomerBehavior success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching operational health
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ViewOperationalHealth called
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: ViewOperationalHealth success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching top products
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: GetTopSellingProducts called with limit=10
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: GetTopSellingProducts success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: fetching category revenue
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: GetRevenueByCategory called with days=30
+[INFO] 2025/05/28 14:18:49 logging.go:31: DashboardService: GetRevenueByCategory success
+[INFO] 2025/05/28 14:18:49 logging.go:31: GetAnalytics: success

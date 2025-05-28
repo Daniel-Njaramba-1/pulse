@@ -10,6 +10,7 @@ type AdminHdl struct {
 	BrandHandler *adminHdl.BrandHandler
 	CategoryHandler *adminHdl.CategoryHandler
 	ProductHandler *adminHdl.ProductHandler
+	DashboardHandler *adminHdl.DashboardHandler
 }
 
 type CustomerHdl struct {
@@ -28,6 +29,7 @@ func NewAdminHdl(adminSvc *AdminServices) *AdminHdl {
 		BrandHandler: adminHdl.NewBrandHandler(adminSvc.brandService),
 		CategoryHandler: adminHdl.NewCategoryHandler(adminSvc.categoryService),
 		ProductHandler: adminHdl.NewProductHandler(adminSvc.productService),
+		DashboardHandler: adminHdl.NewDashboardHandler(adminSvc.dashboardService),
 	}
 }
 

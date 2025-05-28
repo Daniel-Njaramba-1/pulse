@@ -34,6 +34,9 @@
 		"zod": "^3.24.2"
 	},
 	"dependencies": {
+		"d3-array": "^3.2.4",
+		"d3-scale": "^4.0.2",
+		"layerchart": "^1.0.11",
 		"lucide-svelte": "^0.487.0"
 	}
 }

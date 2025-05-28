@@ -18,7 +18,18 @@ export interface Product {
     adjusted_price: number;
     stock_quantity: number;
     stock_threshold: number;
+    is_in_wishlist?: boolean;
 }
+
+export interface Review {
+    id: number;
+    customer_name: string;
+    rating: number;
+    review_text: string;
+    created_at: string;
+}
+
+
 export interface ProductResponse {
     success: boolean;
     data?: Product | Product[];
@@ -87,6 +98,166 @@ export const productHelpers = {
             error.set("Failed to fetch product.");
             return { success: false, error: "Failed to fetch product." };
         }  
+    },
+
+    checkProductInWishlist: async(productId: number): Promise<{success: boolean; inWishlist?: boolean; error?: string }> => {
+        error.set(null);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/check-product-in-wishlist/${productId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
+                },
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                error.set(data.error || "Failed to check wishlist status.");
+                return { success: false, error: data.error || "Failed to check wishlist status." };
+            }
+            return { success: true, inWishlist: data.in_wishlist };
+        } catch (err) {
+            error.set("Failed to check wishlist status.");
+            return { success: false, error: "Failed to check wishlist status." };
+        }
+    },
+
+    addToWishlist: async (productId: number): Promise<{success: boolean; message?: string; error?: string}> => {
+        error.set(null);
+        try {
+            const response = await fetch(`${API_BASE_URL}/add-to-wishlist/${productId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
+                },
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                error.set(data.error || "Failed to add to wishlist.");
+                return { success: false, error: data.error || "Failed to add to wishlist." };
+            }
+            return { success: true, message: data.message };
+        } catch (err) {
+            error.set("Failed to add to wishlist.");
+            return { success: false, error: "Failed to add to wishlist." };
+        } 
+    }, 
+
+    removeFromWishlist: async (productId: number): Promise<{ success: boolean; message?: string; error?: string }> => {
+        error.set(null);
+        try {
+            const response = await fetch(`${API_BASE_URL}/remove-from-wishlist/${productId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
+                }
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                error.set(data.error || "Failed to remove from wishlist.");
+                return { success: false, error: data.error || "Failed to remove from wishlist." };
+            }
+            return { success: true, message: data.message };
+        } catch (err) {
+            error.set("Failed to remove from wishlist.");
+            return { success: false, error: "Failed to remove from wishlist." };
+        }
+    },
+
+    fetchWishlist: async (): Promise<{ success: boolean; data?: Product[]; error?: string }> => {
+        error.set(null);
+        try {
+            const response = await fetch(`${API_BASE_URL}/wishlist`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
+                }
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                error.set(data.error || "Failed to fetch wishlist.");
+                return { success: false, error: data.error || "Failed to fetch wishlist." };
+            }
+            return { success: true, data };
+        } catch (err) {
+            error.set("Failed to fetch wishlist.");
+            return { success: false, error: "Failed to fetch wishlist." };
+        }
+    },
+
+    fetchProductReviews: async (productId: number): Promise<{ success: boolean; data?: Review[]; error?: string }> => {
+        error.set(null);
+        try {
+            const response = await fetch(`${API_BASE_URL}/product-reviews/${productId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
+                }
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                error.set(data.error || "Failed to fetch product reviews.");
+                return { success: false, error: data.error || "Failed to fetch product reviews." };
+            }
+            return { success: true, data };
+        } catch (err) {
+            error.set("Failed to fetch product reviews.");
+            return { success: false, error: "Failed to fetch product reviews." };
+        }
+    },
+
+    reviewProduct: async (productId: number, rating: number, reviewText: string): Promise<{ success: boolean; message?: string; error?: string }> => {
+        error.set(null);
+        try {
+            const response = await fetch(`${API_BASE_URL}/review-product`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    rating,
+                    review_text: reviewText
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                error.set(data.error || "Failed to submit review.");
+                return { success: false, error: data.error || "Failed to submit review." };
+            }
+            return { success: true, message: data.message };
+        } catch (err) {
+            error.set("Failed to submit review.");
+            return { success: false, error: "Failed to submit review." };
+        }
+    },
+
+    verifyPurchase: async (productId: number): Promise<{ success: boolean; purchased?: boolean; error?: string }> => {
+        error.set(null);
+        try {
+            const response = await fetch(`${API_BASE_URL}/verify-purchase/${productId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHelpers.getAuthHeader()
+                }
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                error.set(data.error || "Failed to verify purchase.");
+                return { success: false, error: data.error || "Failed to verify purchase." };
+            }
+            return { success: true, purchased: data.purchased };
+        } catch (err) {
+            error.set("Failed to verify purchase.");
+            return { success: false, error: "Failed to verify purchase." };
+        }
     },
 
     // Helper to create URL-friendly slug for a product

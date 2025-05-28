@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Daniel-Njaramba-1/pulse/internal/db"
+	"github.com/go-co-op/gocron"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -21,6 +22,45 @@ type App struct {
 	db            *sqlx.DB
 	echo          *echo.Echo
 	dbConfig      *db.DBConfig
+}
+
+// startScheduledJobs initializes and starts scheduled background jobs
+func startScheduledJobs() {
+	s := gocron.NewScheduler(time.UTC)
+
+	// Daily price adjustment job (calls Python API)
+	s.Every(1).Day().At("00:00").Do(func() {
+		log.Println("Running daily price adjustment job (Python API)")
+		resp, err := http.Post("http://localhost:5872/adjust-prices", "application/json", nil)
+		if err != nil {
+			log.Printf("Price adjustment API call failed: %v", err)
+			return
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			log.Printf("Price adjustment API returned status: %v", resp.Status)
+		} else {
+			log.Println("Price adjustment API call succeeded")
+		}
+	})
+
+	// Monthly model training job (calls Python API)
+	s.Every(1).Month(1).At("01:00").Do(func() {
+		log.Println("Running monthly model training job (Python API)")
+		resp, err := http.Post("http://localhost:5872/train-model", "application/json", nil)
+		if err != nil {
+			log.Printf("Model training API call failed: %v", err)
+			return
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			log.Printf("Model training API returned status: %v", resp.Status)
+		} else {
+			log.Println("Model training API call succeeded")
+		}
+	})
+
+	s.StartAsync()
 }
 
 // NewApp initializes and returns a new app instance
@@ -44,10 +84,14 @@ func NewApp() (*App, error) {
 	connStr := db.BuildConnStr(dbConfig)
 	go db.StartPriceAdjustmentListener(connStr)
 
+	// start cron job
+	startScheduledJobs()
+	log.Printf("Started jobs: Price adjustment and Model Training")
+
 	// Initialize Echo framework
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:5190", "http://localhost:5195"},
+		AllowOrigins: []string{"http://localhost:5185", "http://localhost:5190", "http://localhost:5195"},
 		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.OPTIONS},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderCookie},
 		AllowCredentials: true,

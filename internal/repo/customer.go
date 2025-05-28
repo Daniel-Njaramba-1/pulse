@@ -91,9 +91,41 @@ type WishlistItem struct {
 	UpdatedAt  time.Time `db:"updated_at" json:"updated_at"`
 }
 
+type WishlistItemDetail struct {
+	// Basic product information
+    Id          int       	`db:"id" json:"id"`
+    WishlistId  int			`db:"wishlist_id" json:"wishlist_id"`
+	ProductId	int			`db:"product_id" json:"product_id"`
+
+	ProductName				string		`db:"product_name" json:"product_name"`
+	ProductImagePath		*string		`db:"product_image_path" json:"product_image_path"`
+	ProductAdjustedPrice  	*float32 	`db:"product_adjusted_price" json:"product_adjusted_price"`
+
+    ProductStockQuantity    *int `db:"product_stock_quantity" json:"product_stock_quantity"`
+}
+
+type WishlistDetail struct {
+	Id         int        `json:"id" db:"id"`
+	CustomerId int        `json:"customer_id" db:"customer_id"`
+	IsActive   bool       `json:"is_active" db:"is_active"`
+	
+	Items      []WishlistItemDetail `json:"items"`
+}
+
 type Review struct {
 	Id				int			`db:"id" json:"id"`
 	CustomerId		int			`db:"customer_id" json:"customer_id"`
+	ProductId		int			`db:"product_id" json:"product_id"`
+	Rating			float32		`db:"rating" json:"rating"`
+	ReviewText		string		`db:"review_text" json:"review_text"`
+	CreatedAt		time.Time	`db:"created_at" json:"created_at"`
+	UpdatedAt		time.Time	`db:"updated_at" json:"updated_at"`
+}
+
+type ReviewDetail struct {
+	Id				int			`db:"id" json:"id"`
+	CustomerId		int			`db:"customer_id" json:"customer_id"`
+	CustomerName 	string		`db:"username" json:"customer_name"`
 	ProductId		int			`db:"product_id" json:"product_id"`
 	Rating			float32		`db:"rating" json:"rating"`
 	ReviewText		string		`db:"review_text" json:"review_text"`

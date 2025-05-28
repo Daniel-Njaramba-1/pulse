@@ -104,14 +104,12 @@ CREATE TABLE IF NOT EXISTS price_model_coefficients (
 CREATE TABLE IF NOT EXISTS price_adjustments (
     id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL,
-    pricing_features_id INTEGER NOT NULL,
     old_price DECIMAL(10, 2) NOT NULL CHECK (old_price >= 0), --  Adjusted price before adjustment
     new_price DECIMAL(10, 2) CHECK (new_price >= 0),  -- Adjusted price log change
     model_version VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    FOREIGN KEY (pricing_features_id) REFERENCES pricing_features(id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS stocks (
@@ -127,7 +125,7 @@ CREATE TABLE IF NOT EXISTS stocks (
 CREATE TABLE IF NOT EXISTS stock_history (
     id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL,
-    event_type VARCHAR(20) NOT NULL, -- "in stock", "out of stock", "restock", "sale"
+    event_type VARCHAR(20) NOT NULL, -- "out of stock", "restock", "sale"
     quantity_change INTEGER NOT NULL,
     quantity_after INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

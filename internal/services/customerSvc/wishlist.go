@@ -128,21 +128,61 @@ func (s *WishlistService) RemoveFromWishlist(ctx context.Context, customerId int
 }
 
 
-func (s *WishlistService) GetWishlistItems(ctx context.Context, customerId int) ([]repo.WishlistItem, error) {
-	var items []repo.WishlistItem
+func (s *WishlistService) GetWishlistDetail(ctx context.Context, customerId int) (*repo.WishlistDetail, error) {
+	var wishlist repo.WishlistDetail
 
-	query := `
-		SELECT wi.*
-		FROM wishlist_items wi
-		JOIN wishlists w ON wi.wishlist_id = w.id
-		WHERE w.customer_id = $1 AND w.is_active = TRUE
-		ORDER BY wi.created_at DESC
+	// Get wishlist
+	wishlistQuery := `
+		SELECT id, customer_id, is_active
+		FROM wishlists
+		WHERE customer_id = $1 AND is_active = TRUE
+		LIMIT 1
 	`
-
-	err := s.db.SelectContext(ctx, &items, query, customerId)
+	err := s.db.GetContext(ctx, &wishlist, wishlistQuery, customerId)
 	if err != nil {
 		return nil, err
 	}
 
-	return items, nil
+	// Get wishlist items with product details
+	itemsQuery := `
+		SELECT 
+			wi.id,
+			wi.wishlist_id,
+			wi.product_id,
+			p.name AS product_name,
+			p.image_path AS product_image_path,
+			pm.adjusted_price AS product_adjusted_price,
+			s.quantity AS product_stock_quantity
+		FROM wishlist_items wi
+		JOIN products p ON wi.product_id = p.id
+		LEFT JOIN product_metrics pm ON p.id = pm.product_id
+		LEFT JOIN stocks s ON p.id = s.product_id
+		WHERE wi.wishlist_id = $1
+		ORDER BY wi.created_at DESC
+	`
+	var items []repo.WishlistItemDetail
+	err = s.db.SelectContext(ctx, &items, itemsQuery, wishlist.Id)
+	if err != nil {
+		return nil, err
+	}
+	wishlist.Items = items
+
+	return &wishlist, nil
+}
+
+func (s *WishlistService) CheckProductInWishlist(ctx context.Context, customerId int, productId int) (bool, error) {
+	var exists bool
+	query := `
+		SELECT EXISTS (
+			SELECT 1
+			FROM wishlist_items wi
+			JOIN wishlists w ON wi.wishlist_id = w.id
+			WHERE w.customer_id = $1 AND w.is_active = TRUE AND wi.product_id = $2
+		)
+	`
+	err := s.db.QueryRowxContext(ctx, query, customerId, productId).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }

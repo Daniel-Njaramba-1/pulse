@@ -21,7 +21,7 @@ func (h *AuthHandler) Register(c echo.Context) error {
     var customer repo.Customer
     if err := c.Bind(&customer); err != nil {
         return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid input"})
-    }
+    } 
 
     token, user, err := h.authentication.RegisterCustomer(c.Request().Context(), &customer)
     if err != nil {

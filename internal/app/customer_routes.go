@@ -50,13 +50,33 @@ func CustomerRoutes(e *echo.Echo, customerHandlers *CustomerHdl) {
         return customerHandlers.PaymentHandler.ProcessPayment(c)
     })
 
-    // // wishlist
-    // protected.GET("/wishlist", func(c echo.Context) error {
-    //     return customerHandlers.WishlistHandler.GetWishlist(c)
-    // })
+    // wishlist
+    protected.GET("/wishlist", func(c echo.Context) error {
+        return customerHandlers.WishlistHandler.GetWishlistItems(c)
+    })
 
-    // // review
-    // protected.POST("/review", func(c echo.Context) error {
-    //     return customerHandlers.ReviewHandler.CreateReview(c)
-    // })
+    protected.POST("/add-to-wishlist/:id", func(c echo.Context) error {
+        return customerHandlers.WishlistHandler.AddToWishlist(c)
+    })
+
+    protected.DELETE("/remove-from-wishlist/:id", func(c echo.Context) error {
+        return customerHandlers.WishlistHandler.RemoveFromWishlist(c)
+    })
+
+    protected.GET("/check-product-in-wishlist/:id", func(c echo.Context) error {
+        return customerHandlers.WishlistHandler.CheckProductInWishlist(c)
+    })
+
+    // review
+    protected.GET("/product-reviews/:id", func(c echo.Context) error {
+        return customerHandlers.ReviewHandler.GetReviewsForProduct(c)
+    })
+    
+    protected.POST("/review-product", func(c echo.Context) error {
+        return customerHandlers.ReviewHandler.ReviewProduct(c)
+    })
+
+    protected.GET("/verify-purchase/:id", func(c echo.Context) error {
+        return customerHandlers.ReviewHandler.VerifyPurchase(c)
+    })
 }
