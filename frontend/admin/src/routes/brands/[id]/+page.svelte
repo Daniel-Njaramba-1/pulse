@@ -79,34 +79,9 @@
                 <div>
                     <Card.Title class="text-lg font-semibold text-gray-700">Details</Card.Title>
                 </div>
-                
-                <Dialog.Root bind:open={isDialogOpen}> 
-                    <Tooltip.Provider> 
-                        <Tooltip.Root> 
-                            <Tooltip.Trigger> 
-                                <Dialog.Trigger>
-                                    <Button variant="outline" size="icon">
-                                        <Pencil class="h-2 w-2"/>
-                                    </Button>
-                                </Dialog.Trigger>
-                            </Tooltip.Trigger>
-                            <Tooltip.Content> 
-                                Edit Brand
-                            </Tooltip.Content>
-                        </Tooltip.Root>
-                    </Tooltip.Provider>
-                    
-                    <Dialog.Content interactOutsideBehavior="ignore"> 
-                        <Dialog.Header> 
-                            <Dialog.Title>Edit Brand</Dialog.Title>
-                            <Dialog.Description>
-                                Update the details of this brand in your inventory system.
-                            </Dialog.Description>
-                        </Dialog.Header>
-                        
-                        
-                    </Dialog.Content>
-                </Dialog.Root>
+                <Button variant="outline" size="icon" onclick={() => goto(`/brands/${brand?.id}/edit`)}>
+                    <Pencil class="h-2 w-2"/>
+                </Button>    
             </Card.Header>
             
             <Card.Content class="pt-1">

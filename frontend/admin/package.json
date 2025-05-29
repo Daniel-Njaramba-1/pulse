@@ -12,12 +12,12 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@lucide/svelte": "^0.487.0",
+		"@lucide/svelte": "^0.482.0",
 		"@sveltejs/adapter-auto": "^4.0.0",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"autoprefixer": "^10.4.20",
-		"bits-ui": "^1.4.2",
+		"bits-ui": "^1.8.0",
 		"clsx": "^2.1.1",
 		"formsnap": "^2.0.1",
 		"mode-watcher": "^1.0.4",
@@ -37,6 +37,7 @@
 		"d3-array": "^3.2.4",
 		"d3-scale": "^4.0.2",
 		"layerchart": "^1.0.11",
-		"lucide-svelte": "^0.487.0"
+		"lucide-svelte": "^0.487.0",
+		"recharts": "^2.15.3"
 	}
 }

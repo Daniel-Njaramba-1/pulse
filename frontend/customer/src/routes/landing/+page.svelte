@@ -276,16 +276,6 @@
             margin-bottom: 20px;
         }
 
-        .feature-highlight {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border: 1px solid #f59e0b;
-            border-radius: 8px;
-            padding: 12px 16px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #92400e;
-        }
-
         /* ========================= HOW IT WORKS SECTION ========================= */
         .how-it-works {
             padding: 100px 0;
@@ -524,20 +514,6 @@
                     Prices update in real-time using <b>Server-Sent Events (SSE)</b> technology.
                     No page refresh needed - watch prices adjust live as market conditions change.
                 </p>
-                <div class="feature-highlight">
-                    Updates every 5-30 seconds based on demand
-                </div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>Complete Transparency</h3>
-                <p>
-                    See exactly why prices change with detailed insights into market factors,
-                    inventory levels, and demand patterns. No hidden algorithms.
-                </p>
-                <div class="feature-highlight">
-                    Full price history available for every item
-                </div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🎯</div>
@@ -546,20 +522,6 @@
                     Our dynamic system ensures competitive prices that reflect real market value,
                     protecting you from overpricing while rewarding early adopters.
                 </p>
-                <div class="feature-highlight">
-                    Average 15-30% better than fixed pricing
-                </div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔔</div>
-                <h3>Smart Notifications</h3>
-                <p>
-                    Get notified when items you're watching hit your target price.
-                    Set price alerts and never miss a great deal.
-                </p>
-                <div class="feature-highlight">
-                    Custom alerts via email, SMS, or browser
-                </div>
             </div>
         </div>
     </div>

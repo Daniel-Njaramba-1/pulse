@@ -12,6 +12,7 @@ type AdminServices struct {
 	categoryService *adminSvc.CategoryService
 	productService *adminSvc.ProductService
 	dashboardService *adminSvc.DashboardService
+	customerService *adminSvc.CustomerService
 }
 
 type CustomerServices struct {
@@ -30,6 +31,7 @@ func NewAdminServices(db *sqlx.DB) *AdminServices {
 	categoryService := adminSvc.NewCategoryService(db)
 	productService := adminSvc.NewProductService(db, categoryService, brandService)
 	dashboardService := adminSvc.NewDashboardService(db)
+	customerService := adminSvc.NewCustomerService(db)
 
 	return &AdminServices{
 		authentication: authentication,
@@ -37,6 +39,7 @@ func NewAdminServices(db *sqlx.DB) *AdminServices {
 		categoryService: categoryService,
 		productService: productService,
 		dashboardService: dashboardService,
+		customerService: customerService,
 	}
 }
 

@@ -3,6 +3,7 @@ module github.com/Daniel-Njaramba-1/pulse
 go 1.23.1
 
 require (
+	github.com/go-co-op/gocron v1.37.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
@@ -12,7 +13,6 @@ require (
 )
 
 require (
-	github.com/go-co-op/gocron v1.37.0 // indirect
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

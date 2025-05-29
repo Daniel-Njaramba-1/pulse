@@ -36,6 +36,26 @@ type ComprehensiveAnalytics struct {
 	CategoryRevenue    interface{} `json:"category_revenue"`
 }
 
+// GetCoefficients - Handler for fetching latest regression model coefficients
+func (h *DashboardHandler) GetCoefficients(c echo.Context) error {
+	logging.LogInfo("GetCoefficients: init")
+	data, err := h.dashboardService.GetCoefficients()
+	if err != nil {
+		logging.LogError("GetCoefficients: Failed to fetch coefficients: " + err.Error())
+		return c.JSON(http.StatusInternalServerError, DashboardResponse{
+			Success: false,
+			Error:   "Failed to fetch coefficients: " + err.Error(),
+		})
+	}
+
+	logging.LogInfo("GetCoefficients: success")
+	return c.JSON(http.StatusOK, DashboardResponse{
+		Success: true,
+		Message: "Latest regression model coefficients retrieved successfully",
+		Data:    data,
+	})
+}
+
 // GetAnalytics - Comprehensive dashboard analytics
 func (h *DashboardHandler) GetAnalytics(c echo.Context) error {
 	logging.LogInfo("GetAnalytics: init")

@@ -48,32 +48,44 @@
 
     {#if $isLoading && $products.length === 0}
         <div class="flex justify-center items-center h-48">
-            <div class="text-gray-500">Loading products...</div>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
         </div>
     {:else if $error}
         <div class="border border-red-300 bg-red-50 p-4 rounded-lg text-red-800">
             Error: {$error}
         </div>
     {:else}
-        <Table.Root>
-            <Table.Header>
-                <Table.Row class="bg-gray-100">
-                    <Table.Head>ID</Table.Head>
-                    <Table.Head>Name</Table.Head>
-                    <Table.Head>Description</Table.Head>
-                    <Table.Head>Active</Table.Head>
-                </Table.Row>
-            </Table.Header>
-            <Table.Body>
-                {#each $products as product (product.id)}
-                <Table.Row class="hover:bg-gray-50 cursor-pointer" data-id={product.id} onclick={() => goto(`/products/${product.id}`, { state: { product } })}>
-                    <Table.Cell>{product.id}</Table.Cell>
-                    <Table.Cell>{product.name}</Table.Cell>
-                    <Table.Cell>{product.description}</Table.Cell>
-                    <Table.Cell>{product.is_active ? "Yes" : "No"}</Table.Cell>
-                </Table.Row>
-                {/each}
-            </Table.Body>
-        </Table.Root>
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {#each $products as product (product.id)}
+                    <tr class="hover:bg-gray-50 cursor-pointer" data-id={product.id} onclick={() => goto(`/products/${product.id}`, { state: { product } })}>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {product.id}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {product.name}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {product.description}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                {product.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                    </tr>
+                    {/each}
+                </tbody>
+            </table>
+        </div>
     {/if}
 </div>

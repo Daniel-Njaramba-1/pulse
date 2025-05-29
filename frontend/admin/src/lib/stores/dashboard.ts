@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
+import { authHelpers } from './auth';
 
 // Types
 export interface ModelPerformanceData {
@@ -83,153 +84,264 @@ export const dashboardData: Writable<DashboardData | null> = writable(null);
 export const loading: Writable<boolean> = writable(false);
 export const error: Writable<string | null> = writable(null);
 
-// Helper functions
-async function fetchWithAuth(endpoint: string, params?: Record<string, string>) {
-    const token = localStorage.getItem('admin_token');
-    if (!token) throw new Error('No authentication token found');
-
-    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
-    const response = await fetch(`${API_URL}${endpoint}${queryString}`, {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch data');
-    }
-
-    return data.data;
-}
-
 // Dashboard data fetching functions
 export async function fetchDashboardAnalytics(days: number = 30) {
+    loading.set(true);
+    error.set(null);
+    
     try {
-        loading.set(true);
-        error.set(null);
-        const data = await fetchWithAuth('/api/admin/dashboard/analytics', { days: days.toString() });
-        dashboardData.set(data);
+        const response = await fetch(`${API_URL}/dashboard/analytics?days=${days}`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                ...authHelpers.getAuthHeader()
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch dashboard analytics');
+        }
+
+        const data = await response.json();
+        dashboardData.set(data.data);
+        return data.data;
     } catch (err) {
-        error.set(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching dashboard analytics:', err);
+        error.set(err instanceof Error ? err.message : 'Failed to fetch dashboard analytics');
+        return null;
     } finally {
         loading.set(false);
     }
 }
 
 export async function fetchModelPerformance() {
+    loading.set(true);
+    error.set(null);
+    
     try {
-        loading.set(true);
-        error.set(null);
-        const data = await fetchWithAuth('/api/admin/dashboard/model-performance');
-        dashboardData.update(current => current ? { ...current, model_performance: data } : null);
+        const response = await fetch(`${API_URL}/dashboard/model-performance`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                ...authHelpers.getAuthHeader()
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch model performance');
+        }
+
+        const data = await response.json();
+        return data.data;
     } catch (err) {
-        error.set(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching model performance:', err);
+        error.set(err instanceof Error ? err.message : 'Failed to fetch model performance');
+        return null;
     } finally {
         loading.set(false);
     }
 }
 
 export async function fetchSalesAnalytics(days: number = 30) {
+    loading.set(true);
+    error.set(null);
+    
     try {
-        loading.set(true);
-        error.set(null);
-        const data = await fetchWithAuth('/api/admin/dashboard/sales', { days: days.toString() });
-        dashboardData.update(current => current ? { ...current, sales_analytics: data } : null);
+        const response = await fetch(`${API_URL}/dashboard/sales?days=${days}`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                ...authHelpers.getAuthHeader()
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch sales analytics');
+        }
+
+        const data = await response.json();
+        return data.data;
     } catch (err) {
-        error.set(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching sales analytics:', err);
+        error.set(err instanceof Error ? err.message : 'Failed to fetch sales analytics');
+        return null;
     } finally {
         loading.set(false);
     }
 }
 
 export async function fetchInventoryStatus() {
+    loading.set(true);
+    error.set(null);
+    
     try {
-        loading.set(true);
-        error.set(null);
-        const data = await fetchWithAuth('/api/admin/dashboard/inventory');
-        dashboardData.update(current => current ? { ...current, inventory_status: data } : null);
+        const response = await fetch(`${API_URL}/dashboard/inventory`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                ...authHelpers.getAuthHeader()
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch inventory status');
+        }
+
+        const data = await response.json();
+        return data.data;
     } catch (err) {
-        error.set(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching inventory status:', err);
+        error.set(err instanceof Error ? err.message : 'Failed to fetch inventory status');
+        return null;
     } finally {
         loading.set(false);
     }
 }
 
 export async function fetchPricingAnalytics(days: number = 7) {
+    loading.set(true);
+    error.set(null);
+    
     try {
-        loading.set(true);
-        error.set(null);
-        const data = await fetchWithAuth('/api/admin/dashboard/pricing', { days: days.toString() });
-        dashboardData.update(current => current ? { ...current, pricing_analytics: data } : null);
+        const response = await fetch(`${API_URL}/dashboard/pricing?days=${days}`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                ...authHelpers.getAuthHeader()
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch pricing analytics');
+        }
+
+        const data = await response.json();
+        return data.data;
     } catch (err) {
-        error.set(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching pricing analytics:', err);
+        error.set(err instanceof Error ? err.message : 'Failed to fetch pricing analytics');
+        return null;
     } finally {
         loading.set(false);
     }
 }
 
 export async function fetchCustomerBehavior() {
+    loading.set(true);
+    error.set(null);
+    
     try {
-        loading.set(true);
-        error.set(null);
-        const data = await fetchWithAuth('/api/admin/dashboard/customers');
-        dashboardData.update(current => current ? { ...current, customer_behavior: data } : null);
+        const response = await fetch(`${API_URL}/dashboard/customers`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                ...authHelpers.getAuthHeader()
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch customer behavior');
+        }
+
+        const data = await response.json();
+        return data.data;
     } catch (err) {
-        error.set(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching customer behavior:', err);
+        error.set(err instanceof Error ? err.message : 'Failed to fetch customer behavior');
+        return null;
     } finally {
         loading.set(false);
     }
 }
 
 export async function fetchOperationalHealth() {
+    loading.set(true);
+    error.set(null);
+    
     try {
-        loading.set(true);
-        error.set(null);
-        const data = await fetchWithAuth('/api/admin/dashboard/health');
-        dashboardData.update(current => current ? { ...current, operational_health: data } : null);
+        const response = await fetch(`${API_URL}/dashboard/health`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                ...authHelpers.getAuthHeader()
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch operational health');
+        }
+
+        const data = await response.json();
+        return data.data;
     } catch (err) {
-        error.set(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching operational health:', err);
+        error.set(err instanceof Error ? err.message : 'Failed to fetch operational health');
+        return null;
     } finally {
         loading.set(false);
     }
 }
 
 export async function fetchTopProducts(limit: number = 10) {
+    loading.set(true);
+    error.set(null);
+    
     try {
-        loading.set(true);
-        error.set(null);
-        const data = await fetchWithAuth('/api/admin/dashboard/top-products', { limit: limit.toString() });
-        dashboardData.update(current => current ? { ...current, top_products: data } : null);
+        const response = await fetch(`${API_URL}/dashboard/top-products?limit=${limit}`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                ...authHelpers.getAuthHeader()
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch top products');
+        }
+
+        const data = await response.json();
+        return data.data;
     } catch (err) {
-        error.set(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching top products:', err);
+        error.set(err instanceof Error ? err.message : 'Failed to fetch top products');
+        return null;
     } finally {
         loading.set(false);
     }
 }
 
 export async function fetchCategoryRevenue(days: number = 30) {
+    loading.set(true);
+    error.set(null);
+    
     try {
-        loading.set(true);
-        error.set(null);
-        const data = await fetchWithAuth('/api/admin/dashboard/category-revenue', { days: days.toString() });
-        dashboardData.update(current => current ? { ...current, category_revenue: data } : null);
+        const response = await fetch(`${API_URL}/dashboard/category-revenue?days=${days}`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                ...authHelpers.getAuthHeader()
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch category revenue');
+        }
+
+        const data = await response.json();
+        return data.data;
     } catch (err) {
-        error.set(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching category revenue:', err);
+        error.set(err instanceof Error ? err.message : 'Failed to fetch category revenue');
+        return null;
     } finally {
         loading.set(false);
     }

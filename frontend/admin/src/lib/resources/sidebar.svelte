@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
-    import { House, LayoutGrid, User, Box, Tags} from "lucide-svelte";
+    import { House, LayoutGrid, User, Box, Tags, ChartSpline, Settings} from "lucide-svelte";
 
     const MenuItems = [
         { name: "Home", url: "/", icon: House },
@@ -9,6 +9,8 @@
         { name: "Brands", url: "/brands", icon: Tags },
         { name: "Products", url: "/products", icon: Box },
         { name: "Customers", url: "/customers", icon: User },
+        { name: "Controls", url: "/controls", icon: Settings },
+        { name: "Dashboard", url: "/dashboard", icon: ChartSpline },
     ];
 
     const currentPathname = $derived(page.url.pathname);

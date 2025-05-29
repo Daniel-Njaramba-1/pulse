@@ -108,7 +108,7 @@ export const categoryHelpers = {
     },
 
     // Update an existing category
-    updateCategory: async (id: number, name: string, description: string, is_active: boolean): Promise<CategoryResponse> => {
+    updateCategory: async (id: number, name: string, description: string): Promise<CategoryResponse> => {
         try {
             const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
                 method: "PUT",
@@ -116,7 +116,7 @@ export const categoryHelpers = {
                     "Content-Type": "application/json",
                     ...authHelpers.getAuthHeader()
                 },
-                body: JSON.stringify({ id, name, description, is_active }),
+                body: JSON.stringify({ id, name, description }),
             });
 
             if (!response.ok) {

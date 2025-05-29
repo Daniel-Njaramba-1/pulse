@@ -66,12 +66,4 @@ Additive:
 Coefficients represent absolute dollar adjustments
 A coefficient of 5 means "add $5 per unit of feature"
 
-# Update the adjusted price in the database
-    update_query = """
-    UPDATE product_metrics 
-    SET 
-        adjusted_price = :adjusted_price,
-        price_adjustment_ratio = :ratio,
-        price_adjustment_bounded = :bounded
-    WHERE product_id = :product_id
-    """
+

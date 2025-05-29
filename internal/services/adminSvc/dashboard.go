@@ -72,6 +72,63 @@ type OperationalHealth struct {
 	Status string  `json:"status" db:"status"`
 }
 
+// CoefficientData holds the latest regression model coefficients
+type CoefficientData struct {
+	ModelVersion                string    `json:"model_version" db:"model_version"`
+	TrainingDate                time.Time `json:"training_date" db:"training_date"`
+	SampleSize                  int       `json:"sample_size" db:"sample_size"`
+	RSquared                    float64   `json:"r_squared" db:"r_squared"`
+	MSE                         float64   `json:"mse" db:"mse"`
+	RMSE                        float64   `json:"rmse" db:"rmse"`
+	MAE                         float64   `json:"mae" db:"mae"`
+	DaysSinceLastSaleCoef       float64   `json:"days_since_last_sale_coef" db:"days_since_last_sale_coef"`
+	SalesVelocityCoef           float64   `json:"sales_velocity_coef" db:"sales_velocity_coef"`
+	TotalSalesCountCoef         float64   `json:"total_sales_count_coef" db:"total_sales_count_coef"`
+	TotalSalesValueCoef         float64   `json:"total_sales_value_coef" db:"total_sales_value_coef"`
+	CategoryPercentileCoef      float64   `json:"category_percentile_coef" db:"category_percentile_coef"`
+	ReviewScoreCoef             float64   `json:"review_score_coef" db:"review_score_coef"`
+	WishlistToSalesRatioCoef    float64   `json:"wishlist_to_sales_ratio_coef" db:"wishlist_to_sales_ratio_coef"`
+	DaysSinceRestockCoef        float64   `json:"days_since_restock_coef" db:"days_since_restock_coef"`
+	CreatedAt                   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt                   time.Time `json:"updated_at" db:"updated_at"`
+}
+
+// GetCoefficients fetches the latest regression model coefficients (LIMIT 1)
+func (s *DashboardService) GetCoefficients() (*CoefficientData, error) {
+	logging.LogInfo("DashboardService: GetCoefficients called")
+	query := `
+		SELECT 
+			model_version,
+			training_date,
+			sample_size,
+			COALESCE(r_squared, 0.0) as r_squared,
+			COALESCE(mse, 0.0) as mse,
+			COALESCE(rmse, 0.0) as rmse,
+			COALESCE(mae, 0.0) as mae,
+			COALESCE(days_since_last_sale_coef, 0.0) as days_since_last_sale_coef,
+			COALESCE(sales_velocity_coef, 0.0) as sales_velocity_coef,
+			COALESCE(total_sales_count_coef, 0.0) as total_sales_count_coef,
+			COALESCE(total_sales_value_coef, 0.0) as total_sales_value_coef,
+			COALESCE(category_percentile_coef, 0.0) as category_percentile_coef,
+			COALESCE(review_score_coef, 0.0) as review_score_coef,
+			COALESCE(wishlist_to_sales_ratio_coef, 0.0) as wishlist_to_sales_ratio_coef,
+			COALESCE(days_since_restock_coef, 0.0) as days_since_restock_coef,
+			created_at,
+			updated_at
+		FROM price_model_coefficients
+		ORDER BY training_date DESC
+		LIMIT 1
+	`
+	var coef CoefficientData
+	err := s.db.Get(&coef, query)
+	if err != nil {
+		logging.LogError("DashboardService: GetCoefficients error: " + err.Error())
+		return nil, err
+	}
+	logging.LogInfo("DashboardService: GetCoefficients success")
+	return &coef, nil
+}
+
 // ViewModelPerformance - Track ML model performance over time
 func (s *DashboardService) ViewModelPerformance() ([]ModelPerformanceData, error) {
 	logging.LogInfo("DashboardService: ViewModelPerformance called")
@@ -366,3 +423,4 @@ func (s *DashboardService) GetRevenueByCategory(days int) ([]struct {
 	}
 	return results, err
 }
+

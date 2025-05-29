@@ -82,6 +82,7 @@ def get_price_model_coefficients():
         model_coeffs = get_model_coefficients()
         if model_coeffs is None:
             return jsonify({"error": "No model coefficients found"}), 404
+            
         results = {
             "model_version": model_coeffs.model_version,
             "training_date": str(model_coeffs.training_date),
@@ -100,7 +101,6 @@ def get_price_model_coefficients():
             "days_since_restock_coef": model_coeffs.days_since_restock_coef
         }
 
-        results = get_price_model_coefficients()
         return jsonify({"coefficients": results}), 200
     except Exception as e:
         logger.exception(f"Error fetching model coefficients: {str(e)}")

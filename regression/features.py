@@ -21,18 +21,34 @@ def get_days_since_last_sale(product_id: int) -> int | None:
     """Calculate days since the last sale of a product."""
     logger.info(f"Called get_days_since_last_sale with product_id={product_id}")
     query = """
-        SELECT last_sale
+        SELECT DATE(last_sale) as last_sale_date
         FROM product_metrics
         WHERE product_id = :product_id
     """
-    with engine.connect() as conn:
-        result = conn.execute(text(query), {"product_id": product_id}).fetchone()
-        if result and result[0]:
-            last_sale = result[0]
-            days_since = (datetime.now() - last_sale).days
-            logger.info(f"get_days_since_last_sale result: {days_since}")
-            return days_since
-        logger.info("get_days_since_last_sale result: None")
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(query), {"product_id": product_id}).fetchone()
+            
+            if result and result[0]:
+                last_sale_date = result[0]
+                today = datetime.now().date()
+                
+                # Calculate difference in days
+                days_since = (today - last_sale_date).days
+                
+                # Handle negative days
+                if days_since < 0:
+                    logger.warning(f"Last sale date {last_sale_date} is in the future for product_id={product_id}")
+                    days_since = 0
+                
+                logger.info(f"get_days_since_last_sale_date_only result: {days_since} days")
+                return days_since
+            else:
+                logger.info(f"No last sale found for product_id={product_id}")
+                return None
+                
+    except Exception as e:
+        logger.error(f"Error calculating days since last sale for product_id={product_id}: {e}")
         return None
     
 def get_sales_velocity(product_id: int, days: int = 30) -> float:
@@ -172,22 +188,40 @@ def get_wishlist_to_sales_ratio(product_id: int) -> float:
 def get_days_since_restock(product_id: int) -> int | None:
     """Calculate days since the last restock of a product."""
     logger.info(f"Called get_days_since_restock with product_id={product_id}")
+    
     query = """
-        SELECT created_at
+        SELECT DATE(created_at) as restock_date
         FROM stock_history
         WHERE product_id = :product_id
         AND event_type = 'restock'
         ORDER BY created_at DESC
         LIMIT 1
     """
-    with engine.connect() as conn:
-        result = conn.execute(text(query), {"product_id": product_id}).fetchone()
-        if result and result[0]:
-            last_restock = result[0]
-            days_since = (datetime.now() - last_restock).days
-            logger.info(f"get_days_since_restock result: {days_since}")
-            return days_since
-        logger.info("get_days_since_restock result: None")
+    
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(query), {"product_id": product_id}).fetchone()
+            
+            if result and result[0]:
+                last_restock_date = result[0]
+                today = datetime.now().date()
+                
+                # Calculate difference in days
+                days_since = (today - last_restock_date).days
+                
+                # Handle negative days
+                if days_since < 0:
+                    logger.warning(f"Last restock date {last_restock_date} is in the future for product_id={product_id}")
+                    days_since = 0
+                
+                logger.info(f"get_days_since_restock_date_only result: {days_since} days")
+                return days_since
+            else:
+                logger.info(f"No restock found for product_id={product_id}")
+                return None
+                
+    except Exception as e:
+        logger.error(f"Error calculating days since last restock for product_id={product_id}: {e}")
         return None
 
 def compute_all_features(product_id: int) -> dict:
