@@ -205,7 +205,7 @@ def adjust_price_for_product(product_id, min_ratio=0.8, max_ratio=1.2):
         pm.adjusted_price
     FROM pricing_features pf
     JOIN product_metrics pm ON pf.product_id = pm.product_id
-    WHERE pf.product_id = :product_id
+    WHERE pf.product_id = %(product_id)s
     """
     df = pd.read_sql(query, engine, params={'product_id': product_id})
     
@@ -241,6 +241,10 @@ def adjust_price_for_product(product_id, min_ratio=0.8, max_ratio=1.2):
     base_price = df['base_price'].iloc[0]
     old_adjusted_price = df['adjusted_price'].iloc[0] if not pd.isnull(df['adjusted_price'].iloc[0]) else None
     adjusted_price = base_price * bounded_ratio
+
+    # Convert to native Python float to avoid PostgreSQL schema interpretation issues
+    adjusted_price = float(adjusted_price)
+    old_adjusted_price = float(old_adjusted_price) if old_adjusted_price is not None else None
 
     # Update the adjusted price in the database
     update_query = """

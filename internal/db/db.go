@@ -205,6 +205,22 @@ func StartSaleListener(connStr string) {
 			log.Printf("Successfully triggered feature computation for product %d", sale.ProductID)
 			logging.LogInfo("Successfully triggered feature computation for product %d", sale.ProductID)
 
+			// Call adjust price API for the specific product
+			adjustURL := fmt.Sprintf("http://localhost:5872/adjust-price/%d", sale.ProductID)
+			adjustResp, err := http.Post(adjustURL, "application/json", nil)
+			if err != nil {
+				logging.LogError("Error calling adjust price API: %v", err)
+				log.Printf("Error calling adjust price API: %v", err)
+				continue
+			}
+			if adjustResp.StatusCode != http.StatusOK {
+				logging.LogError("Error response from adjust price API: %v", adjustResp.Status)
+				log.Printf("Error response from adjust price API: %v", adjustResp.Status)
+				continue
+			}
+			log.Printf("Successfully triggered price adjustment for product %d", sale.ProductID)
+			logging.LogInfo("Successfully triggered price adjustment for product %d", sale.ProductID)
+
 		case <-time.After(90 * time.Second):
 			// Ping the listener to keep the connection alive
 			go func() {

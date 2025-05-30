@@ -462,3 +462,91 @@
 [INFO] 2025/05/29 23:20:15 logging.go:31: DashboardService: GetCoefficients success
 [INFO] 2025/05/29 23:20:15 logging.go:31: GetCoefficients: success
 [INFO] 2025/05/29 23:20:15 logging.go:31: GetCoefficients: data: &{ModelVersion:v20250529_135120 TrainingDate:2025-05-29 13:51:20.143863 +0000 +0000 SampleSize:15 RSquared:0.51936369 MSE:0 RMSE:1.57e-06 MAE:1.18e-06 DaysSinceLastSaleCoef:0 SalesVelocityCoef:0 TotalSalesCountCoef:-1e-06 TotalSalesValueCoef:0 CategoryPercentileCoef:-3e-06 ReviewScoreCoef:0 WishlistToSalesRatioCoef:0 DaysSinceRestockCoef:1e-06 CreatedAt:2025-05-29 13:51:20.145084 +0000 +0000 UpdatedAt:2025-05-29 13:51:20.145084 +0000 +0000}
+[INFO] 2025/05/30 05:17:19 logging.go:31: GetAnalytics: init
+[INFO] 2025/05/30 05:17:19 logging.go:31: GetAnalytics: fetching model performance
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: ViewModelPerformance called
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: ViewModelPerformance success
+[INFO] 2025/05/30 05:17:19 logging.go:31: GetAnalytics: fetching sales analytics
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: AnalyseSales called with days=30
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: AnalyseSales success
+[INFO] 2025/05/30 05:17:19 logging.go:31: GetAnalytics: fetching inventory status
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: ManageInventory called
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: ManageInventory success
+[INFO] 2025/05/30 05:17:19 logging.go:31: GetAnalytics: fetching pricing analytics
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: AnalyseDynamicPricing called with days=30
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: AnalyseDynamicPricing success
+[INFO] 2025/05/30 05:17:19 logging.go:31: GetAnalytics: fetching customer behavior
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: AnalyseCustomerBehavior called
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: AnalyseCustomerBehavior success
+[INFO] 2025/05/30 05:17:19 logging.go:31: GetAnalytics: fetching operational health
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: ViewOperationalHealth called
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: ViewOperationalHealth success
+[INFO] 2025/05/30 05:17:19 logging.go:31: GetAnalytics: fetching top products
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: GetTopSellingProducts called with limit=10
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: GetTopSellingProducts success
+[INFO] 2025/05/30 05:17:19 logging.go:31: GetAnalytics: fetching category revenue
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: GetRevenueByCategory called with days=30
+[INFO] 2025/05/30 05:17:19 logging.go:31: DashboardService: GetRevenueByCategory success
+[INFO] 2025/05/30 05:17:19 logging.go:31: GetAnalytics: success
+[INFO] 2025/05/30 05:18:23 logging.go:31: GetCoefficients: init
+[INFO] 2025/05/30 05:18:23 logging.go:31: DashboardService: GetCoefficients called
+[INFO] 2025/05/30 05:18:23 logging.go:31: DashboardService: GetCoefficients success
+[INFO] 2025/05/30 05:18:23 logging.go:31: GetCoefficients: success
+[INFO] 2025/05/30 05:20:43 logging.go:31: GetCoefficients: init
+[INFO] 2025/05/30 05:20:43 logging.go:31: DashboardService: GetCoefficients called
+[INFO] 2025/05/30 05:20:43 logging.go:31: DashboardService: GetCoefficients success
+[INFO] 2025/05/30 05:20:43 logging.go:31: GetCoefficients: success
+[INFO] 2025/05/30 05:21:30 logging.go:31: GetCoefficients: init
+[INFO] 2025/05/30 05:21:30 logging.go:31: DashboardService: GetCoefficients called
+[INFO] 2025/05/30 05:21:30 logging.go:31: DashboardService: GetCoefficients success
+[INFO] 2025/05/30 05:21:30 logging.go:31: GetCoefficients: success
+[INFO] 2025/05/30 05:21:41 logging.go:31: GetCoefficients: init
+[INFO] 2025/05/30 05:21:41 logging.go:31: DashboardService: GetCoefficients called
+[INFO] 2025/05/30 05:21:41 logging.go:31: DashboardService: GetCoefficients success
+[INFO] 2025/05/30 05:21:41 logging.go:31: GetCoefficients: success
+[INFO] 2025/05/30 05:23:10 logging.go:31: GetCoefficients: init
+[INFO] 2025/05/30 05:23:10 logging.go:31: DashboardService: GetCoefficients called
+[INFO] 2025/05/30 05:23:10 logging.go:31: DashboardService: GetCoefficients success
+[INFO] 2025/05/30 05:23:10 logging.go:31: GetCoefficients: success
+[INFO] 2025/05/30 05:24:14 logging.go:31: Received sale notification: {"id":22,"order_item_id":22,"product_id":53,"sale_price":799.99,"quantity":2,"created_at":"2025-05-30T05:24:14.163927","updated_at":"2025-05-30T05:24:14.163927"}
+[INFO] 2025/05/30 05:24:14 logging.go:31: Successfully triggered feature computation for product 53
+[ERROR] 2025/05/30 05:24:14 logging.go:36: Error response from adjust price API: 500 INTERNAL SERVER ERROR
+[INFO] 2025/05/30 05:40:12 logging.go:31: GetCoefficients: init
+[INFO] 2025/05/30 05:40:12 logging.go:31: DashboardService: GetCoefficients called
+[INFO] 2025/05/30 05:40:12 logging.go:31: DashboardService: GetCoefficients success
+[INFO] 2025/05/30 05:40:12 logging.go:31: GetCoefficients: success
+[INFO] 2025/05/30 05:41:17 logging.go:31: Received sale notification: {"id":23,"order_item_id":23,"product_id":51,"sale_price":879.99,"quantity":6,"created_at":"2025-05-30T05:41:17.491397","updated_at":"2025-05-30T05:41:17.491397"}
+[INFO] 2025/05/30 05:41:17 logging.go:31: Successfully triggered feature computation for product 51
+[ERROR] 2025/05/30 05:41:17 logging.go:36: Error response from adjust price API: 500 INTERNAL SERVER ERROR
+[INFO] 2025/05/30 05:42:37 logging.go:31: Received sale notification: {"id":24,"order_item_id":24,"product_id":48,"sale_price":719.99,"quantity":1,"created_at":"2025-05-30T05:42:37.643648","updated_at":"2025-05-30T05:42:37.643648"}
+[INFO] 2025/05/30 05:42:37 logging.go:31: Successfully triggered feature computation for product 48
+[ERROR] 2025/05/30 05:42:37 logging.go:36: Error response from adjust price API: 500 INTERNAL SERVER ERROR
+[INFO] 2025/05/30 05:45:46 logging.go:31: Received sale notification: {"id":25,"order_item_id":25,"product_id":53,"sale_price":799.99,"quantity":1,"created_at":"2025-05-30T05:45:46.698625","updated_at":"2025-05-30T05:45:46.698625"}
+[INFO] 2025/05/30 05:45:46 logging.go:31: Successfully triggered feature computation for product 53
+[INFO] 2025/05/30 05:45:46 logging.go:31: Successfully triggered price adjustment for product 53
+[INFO] 2025/05/30 05:48:47 logging.go:31: GetAnalytics: init
+[INFO] 2025/05/30 05:48:47 logging.go:31: GetAnalytics: fetching model performance
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: ViewModelPerformance called
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: ViewModelPerformance success
+[INFO] 2025/05/30 05:48:47 logging.go:31: GetAnalytics: fetching sales analytics
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: AnalyseSales called with days=30
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: AnalyseSales success
+[INFO] 2025/05/30 05:48:47 logging.go:31: GetAnalytics: fetching inventory status
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: ManageInventory called
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: ManageInventory success
+[INFO] 2025/05/30 05:48:47 logging.go:31: GetAnalytics: fetching pricing analytics
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: AnalyseDynamicPricing called with days=30
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: AnalyseDynamicPricing success
+[INFO] 2025/05/30 05:48:47 logging.go:31: GetAnalytics: fetching customer behavior
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: AnalyseCustomerBehavior called
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: AnalyseCustomerBehavior success
+[INFO] 2025/05/30 05:48:47 logging.go:31: GetAnalytics: fetching operational health
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: ViewOperationalHealth called
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: ViewOperationalHealth success
+[INFO] 2025/05/30 05:48:47 logging.go:31: GetAnalytics: fetching top products
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: GetTopSellingProducts called with limit=10
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: GetTopSellingProducts success
+[INFO] 2025/05/30 05:48:47 logging.go:31: GetAnalytics: fetching category revenue
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: GetRevenueByCategory called with days=30
+[INFO] 2025/05/30 05:48:47 logging.go:31: DashboardService: GetRevenueByCategory success
+[INFO] 2025/05/30 05:48:47 logging.go:31: GetAnalytics: success

@@ -113,7 +113,7 @@
     <div class="container mx-auto p-6">
         <!-- Header Section -->
         <div class="bg-white shadow-xl rounded-2xl mb-8 overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
+            <div class="bg-gray-800 p-6">
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-3xl font-bold text-white mb-2">Dynamic Pricing Model</h1>
@@ -219,7 +219,7 @@
 
             <!-- Performance Metrics -->
             <div class="bg-white rounded-xl shadow-lg mb-8 overflow-hidden">
-                <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-4">
+                <div class="bg-gray-800 p-4">
                     <h2 class="text-xl font-bold text-white flex items-center">
                         <span class="mr-2">📊</span>
                         Model Performance Metrics
@@ -253,7 +253,7 @@
 
             <!-- Coefficients Grid -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-4">
+                <div class="bg-gray-800 p-4">
                     <h2 class="text-xl font-bold text-white flex items-center">
                         <span class="mr-2">⚙️</span>
                         Feature Coefficients & Impact Analysis
